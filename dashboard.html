@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" data-color-theme="classic">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomorrow.io — Weather Risk Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,400;0,700;0,900;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="dashboard.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff705c"/>
+            <stop offset="53%" stop-color="#ba74ac"/>
+            <stop offset="100%" stop-color="#7479ff"/>
+          </linearGradient>
+        </defs>
+        <rect width="28" height="28" rx="6" fill="url(#lg)"/>
+        <path d="M8 9h12M14 9v10" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <button class="nav-btn active" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+    </button>
+    <button class="nav-btn" title="Locations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+        <circle cx="12" cy="9" r="2.5"/>
+      </svg>
+    </button>
+    <button class="nav-btn" title="Alerts" style="position:relative">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="nav-badge"></span>
+    </button>
+    <button class="nav-btn" title="Reports">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/>
+        <line x1="8" y1="17" x2="12" y2="17"/>
+      </svg>
+    </button>
+    <div class="sidebar-spacer"></div>
+    <button class="nav-btn" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+
+    <!-- ── ZONE 1: TOP BAR ── -->
+    <nav class="topbar">
+      <span class="brand-wordmark">tomorrow<em>.</em>io</span>
+
+      <div class="bar-sep"></div>
+
+      <!-- Location pill -->
+      <div class="location-pill" id="location-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        <span id="location-pill-text">Chicago, IL</span>
+        <span class="location-pill-x">×</span>
+      </div>
+
+      <!-- View chip -->
+      <div class="view-chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 6s4-5 11-5 11 5 11 5-4 5-11 5-11-5-11-5z"/><circle cx="12" cy="6" r="2"/>
+        </svg>
+        Risk Overview
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px">
+          <polyline points="6,9 12,15 18,9"/>
+        </svg>
+      </div>
+
+      <div class="bar-right">
+        <span class="live-clock" id="live-clock">—</span>
+        <div class="alert-chip"><span class="pulse-dot"></span>3 Active Alerts</div>
+        <button class="icon-btn" title="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+        </button>
+        <button class="icon-btn" title="Help">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+        <button class="icon-btn" title="Notifications" style="position:relative">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span style="position:absolute;top:5px;right:5px;width:6px;height:6px;background:var(--sev-3);border-radius:50%;border:1.5px solid var(--bg-0)"></span>
+        </button>
+        <!-- AI Risk Advisor toggle -->
+        <button class="icon-btn ai-topbar-btn active" id="ai-toggle-btn" title="Gale — AI Risk Advisor" onclick="toggleAiDrawer()">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+            <path d="M19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75L19 14z"/>
+            <path d="M5 17l.5 1.5L7 19l-1.5.5L5 21l-.5-1.5L3 19l1.5-.5L5 17z"/>
+          </svg>
+        </button>
+        <div class="user-avatar">YC</div>
+      </div>
+    </nav>
+
+    <!-- ── ZONE 2: CONTENT AREA ── -->
+    <div class="content-area">
+
+      <!-- MAP -->
+      <div class="map-panel">
+        <div id="leaflet-map"></div>
+
+        <!-- Top-left toolbar (floats over map) -->
+        <div class="map-toolbar-tl">
+          <button class="tb-btn active-tool" title="Pan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M12 12v.01"/>
+              <path d="M3 12h18M12 3v18"/>
+            </svg>
+          </button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" title="Measure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4"/>
+            </svg>
+          </button>
+          <button class="tb-btn" title="Alert zone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" title="Layers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12,2 22,8.5 12,15 2,8.5"/>
+              <polyline points="2,15.5 12,22 22,15.5"/>
+              <polyline points="2,12 12,18.5 22,12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── RIGHT PANEL ── -->
+      <div class="right-panel">
+
+        <!-- City detail -->
+        <div class="city-detail">
+          <div class="city-detail-header">
+            <div class="city-detail-info">
+              <div class="city-name" id="city-name">Chicago</div>
+              <div class="city-meta">
+                <span id="city-state">Illinois</span>
+                <span>·</span>
+                <span id="city-level" class="sev-4">● Extreme Risk</span>
+              </div>
+            </div>
+          </div>
+          <div class="risk-bars" id="city-risk-bars"></div>
+        </div>
+
+      </div><!-- /right-panel -->
+    </div><!-- /content-area -->
+
+    <!-- ── ZONE 3: TIMELINE PANEL ── -->
+    <div class="timeline-panel">
+
+      <div class="tab-bar">
+        <div class="tab active">Risk Overview</div>
+        <div class="tab">7-Day Timeline</div>
+        <div class="tab-actions">
+          <button class="tab-ghost-btn">Log an Operation</button>
+          <button class="tab-ghost-btn">Go to View →</button>
+        </div>
+      </div>
+
+      <div class="timeline-body">
+
+        <!-- Location + risk list -->
+        <div class="tl-location-col">
+          <div>
+            <div class="tl-loc-row">
+              <div class="tl-loc-dot"></div>
+              <span id="tl-city-name">Chicago, IL</span>
+            </div>
+            <div class="tl-loc-sub" id="tl-city-sub">Extreme flood risk · 3 alerts active</div>
+          </div>
+          <div id="tl-risk-rows"></div>
+        </div>
+
+        <!-- 7-day grid -->
+        <div class="tl-grid-col" style="position:relative">
+          <div class="tl-day-headers" id="tl-day-headers"></div>
+          <div class="tl-grid-rows" id="tl-grid-rows"></div>
+          <!-- Scrubber -->
+          <div class="tl-scrubber" id="tl-scrubber">
+            <div class="tl-scrubber-label" id="tl-scrubber-label">19 Apr 1:27 PM</div>
+          </div>
+        </div>
+
+        <!-- Risk overview tiles -->
+        <div class="tl-risk-overview">
+          <div class="tl-ov-label">All Risk Types</div>
+          <div class="tl-ov-tile">
+            <div class="tl-ov-icon">🌊</div>
+            <div class="tl-ov-info">
+              <div class="tl-ov-name">Flooding</div>
+              <div class="tl-ov-lvl sev-4">Extreme</div>
+            </div>
+            <div class="tl-ov-delta delta-up">↑ +34%</div>
+          </div>
+          <div class="tl-ov-tile">
+            <div class="tl-ov-icon">🌡️</div>
+            <div class="tl-ov-info">
+              <div class="tl-ov-name">Extreme Heat</div>
+              <div class="tl-ov-lvl sev-2">Warning</div>
+            </div>
+            <div class="tl-ov-delta delta-up">↑ +12%</div>
+          </div>
+          <div class="tl-ov-tile">
+            <div class="tl-ov-icon">💨</div>
+            <div class="tl-ov-info">
+              <div class="tl-ov-name">High Wind</div>
+              <div class="tl-ov-lvl sev-1">Watch</div>
+            </div>
+            <div class="tl-ov-delta delta-down">↓ −8%</div>
+          </div>
+          <div class="tl-ov-tile">
+            <div class="tl-ov-icon">❄️</div>
+            <div class="tl-ov-info">
+              <div class="tl-ov-name">Winter Storm</div>
+              <div class="tl-ov-lvl sev-ok">None</div>
+            </div>
+            <div class="tl-ov-delta delta-flat">— 0%</div>
+          </div>
+          <div class="tl-ov-tile">
+            <div class="tl-ov-icon">🌫️</div>
+            <div class="tl-ov-info">
+              <div class="tl-ov-name">Fog / Visibility</div>
+              <div class="tl-ov-lvl sev-0">Advisory</div>
+            </div>
+            <div class="tl-ov-delta delta-down">↓ −22%</div>
+          </div>
+        </div>
+
+      </div><!-- /timeline-body -->
+
+      <!-- FAB -->
+      <button class="tl-fab" title="Quick insight">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"/>
+        </svg>
+      </button>
+
+    </div><!-- /timeline-panel -->
+  </main>
+</div>
+
+<!-- ── AI DRAWER ── -->
+<div class="ai-drawer open" id="ai-drawer">
+  <div class="ai-drawer-header">
+    <div class="ai-drawer-icon">
+      <svg viewBox="0 0 24 24" fill="var(--accent)" stroke="none" width="13" height="13">
+        <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+        <path d="M19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75L19 14z"/>
+        <path d="M5 17l.5 1.5L7 19l-1.5.5L5 21l-.5-1.5L3 19l1.5-.5L5 17z"/>
+      </svg>
+    </div>
+    <span class="ai-drawer-title">Gale</span>
+    <span class="ai-drawer-sub">· AI Risk Advisor</span>
+    <div class="ai-drawer-live">
+      <span class="live-lbl">LIVE</span>
+      <span class="live-dot"></span>
+    </div>
+    <button class="ai-drawer-close" onclick="toggleAiDrawer()" title="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="chat-scroll" id="chat-messages"></div>
+
+  <div class="chips-row">
+    <button class="chip" onclick="sendChip('What\'s my highest risk location?')">🔴 Highest risk?</button>
+    <button class="chip" onclick="sendChip('Draft an alert for my ops team')">📢 Draft alert</button>
+    <button class="chip" onclick="sendChip('Compare this week vs last week')">📊 Week vs last</button>
+    <button class="chip" onclick="sendChip('Show me contingency options')">🔀 Contingencies</button>
+  </div>
+
+  <div class="chat-input-row">
+    <input type="text" class="chat-input" id="ai-input"
+      placeholder="Ask about risks, routes, or business impact…"
+      onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
