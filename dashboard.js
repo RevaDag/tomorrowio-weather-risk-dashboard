@@ -375,6 +375,9 @@ function selectCity(key) {
   current = key;
   const c = CITIES[key];
 
+  const drawer = document.getElementById('ai-drawer');
+  if (drawer.classList.contains('open')) toggleAiDrawer();
+
   document.getElementById('location-pill-text').textContent = `${c.name}, ${c.abbr}`;
 
   document.getElementById('city-name').textContent = c.name;
