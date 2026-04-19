@@ -279,6 +279,7 @@ input  { font-family: inherit; }
   background: var(--bg-1);
   display: flex; flex-direction: column;
   overflow: hidden;
+  position: relative;
 }
 
 .city-detail {
@@ -660,3 +661,223 @@ input  { font-family: inherit; }
 .ct-1  { background: rgba(255,179,69,0.09); }
 .ct-0  { background: rgba(143,168,255,0.07); }
 .ct-ok { background: rgba(77,206,176,0.05); }
+
+/* ── RIGHT PANEL RESTRUCTURE ──────────────────────────────────────────── */
+.right-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.rp-normal {
+  display: flex; flex-direction: column;
+  height: 100%; overflow-y: auto; overflow-x: hidden;
+}
+
+.rp-alerts {
+  display: flex; flex-direction: column;
+  height: 100%; overflow: hidden;
+}
+
+/* ── SECTION HEADER ───────────────────────────────────────────────────── */
+.rp-section-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px 7px;
+  border-bottom: 1px solid var(--border-2);
+  flex-shrink: 0;
+}
+.rp-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+  text-transform: uppercase; color: var(--content-4);
+}
+.rp-section-count {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700; color: var(--content-4);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+}
+
+/* ── ALERT CHIP ACTIVE STATE ──────────────────────────────────────────── */
+.alert-chip.active {
+  background: rgba(255,84,73,0.22);
+  border-color: rgba(255,84,73,0.5);
+}
+
+/* ── LOCATIONS LIST ───────────────────────────────────────────────────── */
+.locations-panel {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-2);
+}
+
+.loc-list {
+  display: flex; flex-direction: column;
+}
+
+.loc-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(48,47,79,0.4);
+  transition: background 0.1s;
+}
+.loc-card:last-child { border-bottom: none; }
+.loc-card:hover { background: var(--bg-2); }
+.loc-card.selected { background: var(--highlight-selected); }
+.loc-card.selected .loc-card-name { color: var(--content-1); }
+
+.loc-sev-badge {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+.loc-card-info { flex: 1; min-width: 0; }
+.loc-card-name {
+  font-size: 12px; font-weight: 700; color: var(--content-2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.loc-card-sub {
+  font-size: 10px; color: var(--content-4);
+  text-transform: uppercase; letter-spacing: 0.3px;
+  margin-top: 1px;
+}
+
+.loc-card-right {
+  display: flex; flex-direction: column; align-items: flex-end;
+  flex-shrink: 0;
+}
+.loc-card-score {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 13px; font-weight: 500; line-height: 1;
+}
+.loc-card-lbl {
+  font-size: 9px; color: var(--content-4);
+  text-transform: uppercase; letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+/* ── BUSINESS IMPACT ──────────────────────────────────────────────────── */
+.impact-section {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-2);
+  padding-bottom: 10px;
+}
+
+.impact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--border-2);
+  border: 1px solid var(--border-2);
+  border-radius: 6px; overflow: hidden;
+  margin: 8px 14px 0;
+}
+
+.impact-tile {
+  background: var(--bg-2);
+  padding: 9px 12px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+
+.impact-tile-val {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 16px; font-weight: 500; color: var(--content-1);
+  line-height: 1;
+}
+.impact-tile-val.impact-tile-risk {
+  font-size: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  color: white;
+  opacity: 0.9;
+}
+.impact-tile-lbl {
+  font-size: 10px; color: var(--content-4);
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+.impact-action-btn {
+  display: block; width: calc(100% - 28px);
+  margin: 8px 14px 0;
+  padding: 8px 12px;
+  background: var(--accent-deemphasized);
+  border: 1px solid rgba(0,114,245,0.28); border-radius: 5px;
+  color: var(--accent); font-family: inherit;
+  font-size: 11px; font-weight: 700;
+  text-align: left; cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.impact-action-btn:hover {
+  background: rgba(0,114,245,0.26);
+  border-color: rgba(0,114,245,0.42);
+}
+
+/* ── ALERTS PANEL ─────────────────────────────────────────────────────── */
+.alerts-hdr {
+  background: var(--bg-1);
+  gap: 6px;
+}
+.alerts-back-btn {
+  display: flex; align-items: center; gap: 4px;
+  background: transparent; border: none;
+  color: var(--content-3); font-family: inherit;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  padding: 2px 0;
+  transition: color 0.1s;
+}
+.alerts-back-btn:hover { color: var(--content-1); }
+
+.alerts-list {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+
+.alert-item {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex; flex-direction: column; gap: 5px;
+}
+.alert-item:last-child { border-bottom: none; }
+
+.alert-item-top {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.alert-sev-badge {
+  font-size: 9px; font-weight: 900; letter-spacing: 0.8px;
+  padding: 2px 6px; border-radius: 3px;
+  background: currentColor;
+}
+.alert-sev-badge.sev-4 { background: rgba(206,0,37,0.18); color: var(--sev-4); }
+.alert-sev-badge.sev-3 { background: rgba(255,84,73,0.15); color: var(--sev-3); }
+.alert-sev-badge.sev-2 { background: rgba(254,120,44,0.15); color: var(--sev-2); }
+.alert-sev-badge.sev-1 { background: rgba(255,179,69,0.15); color: var(--sev-1); }
+
+.alert-city-name {
+  font-size: 11px; font-weight: 700; color: var(--content-2);
+}
+.alert-time {
+  margin-left: auto;
+  font-size: 10px; color: var(--content-4);
+  font-family: "Roboto Mono", ui-monospace, monospace;
+}
+
+.alert-type {
+  font-size: 13px; font-weight: 700; color: var(--content-1);
+  line-height: 1.2;
+}
+
+.alert-desc {
+  font-size: 11px; color: var(--content-3); line-height: 1.5;
+}
+
+.alert-action-btn {
+  display: inline-block; align-self: flex-start;
+  margin-top: 2px; padding: 4px 10px;
+  background: var(--bg-3); border: 1px solid var(--border-0);
+  border-radius: 4px; color: var(--content-1);
+  font-family: inherit; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: background 0.1s, border-color 0.1s;
+}
+.alert-action-btn:hover {
+  background: var(--accent-deemphasized);
+  border-color: rgba(0,114,245,0.35);
+  color: var(--accent);
+}

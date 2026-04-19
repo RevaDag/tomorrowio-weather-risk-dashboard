@@ -96,7 +96,7 @@
 
       <div class="bar-right">
         <span class="live-clock" id="live-clock">—</span>
-        <div class="alert-chip"><span class="pulse-dot"></span>3 Active Alerts</div>
+        <div class="alert-chip" id="alert-chip" onclick="toggleAlertsView()" style="cursor:pointer"><span class="pulse-dot"></span><span id="alert-chip-label">3 Active Alerts</span></div>
         <button class="icon-btn" title="Share">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -168,22 +168,58 @@
       </div>
 
       <!-- ── RIGHT PANEL ── -->
-      <div class="right-panel">
+      <div class="right-panel" id="right-panel">
 
-        <!-- City detail -->
-        <div class="city-detail">
-          <div class="city-detail-header">
-            <div class="city-detail-info">
-              <div class="city-name" id="city-name">Chicago</div>
-              <div class="city-meta">
-                <span id="city-state">Illinois</span>
-                <span>·</span>
-                <span id="city-level" class="sev-4">● Extreme Risk</span>
+        <!-- ── NORMAL VIEW ── -->
+        <div class="rp-normal" id="rp-normal">
+
+          <!-- Locations list -->
+          <div class="locations-panel">
+            <div class="rp-section-hdr">
+              <span class="rp-section-title">Monitored Locations</span>
+              <span class="rp-section-count" id="rp-loc-count">5 locations</span>
+            </div>
+            <div class="loc-list" id="loc-list"></div>
+          </div>
+
+          <!-- City detail -->
+          <div class="city-detail">
+            <div class="city-detail-header">
+              <div class="city-detail-info">
+                <div class="city-name" id="city-name">Chicago</div>
+                <div class="city-meta">
+                  <span id="city-state">Illinois</span>
+                  <span>·</span>
+                  <span id="city-level" class="sev-4">● Extreme Risk</span>
+                </div>
               </div>
             </div>
+            <div class="risk-bars" id="city-risk-bars"></div>
           </div>
-          <div class="risk-bars" id="city-risk-bars"></div>
-        </div>
+
+          <!-- Business impact -->
+          <div class="impact-section">
+            <div class="rp-section-hdr">
+              <span class="rp-section-title">Business Impact</span>
+            </div>
+            <div class="impact-grid" id="impact-grid"></div>
+            <button class="impact-action-btn" id="impact-action-btn"></button>
+          </div>
+
+        </div><!-- /rp-normal -->
+
+        <!-- ── ALERTS VIEW ── -->
+        <div class="rp-alerts" id="rp-alerts">
+          <div class="rp-section-hdr alerts-hdr">
+            <button class="alerts-back-btn" onclick="toggleAlertsView()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="15,18 9,12 15,6"/></svg>
+              Back
+            </button>
+            <span class="rp-section-title">Active Alerts</span>
+            <span class="rp-section-count sev-3" id="rp-alert-count">3 critical</span>
+          </div>
+          <div class="alerts-list" id="alerts-list"></div>
+        </div><!-- /rp-alerts -->
 
       </div><!-- /right-panel -->
     </div><!-- /content-area -->

@@ -6,7 +6,8 @@ const CITIES = {
     name:'Chicago', state:'Illinois', abbr:'IL',
     levelLabel:'Extreme Risk', levelClass:'sev-4',
     sub:'Extreme flood risk · 3 alerts active',
-    exposure:'$42,000',
+    exposure:'$42,000', opsAffected:3, staffAtRisk:24,
+    topAction:'Reroute Chicago I-90/94 shipments',
     risks:[
       { name:'Flooding',     pct:94, fill:'fill-4', color:'var(--sev-4)' },
       { name:'Extreme Wind', pct:67, fill:'fill-2', color:'var(--sev-2)' },
@@ -31,7 +32,8 @@ const CITIES = {
     name:'Dallas', state:'Texas', abbr:'TX',
     levelLabel:'Warning', levelClass:'sev-2',
     sub:'Heat warning · 1 alert active',
-    exposure:'$18,500',
+    exposure:'$18,500', opsAffected:2, staffAtRisk:38,
+    topAction:'Activate heat protocol at Dallas hub',
     risks:[
       { name:'Extreme Heat',   pct:78, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Flash Flooding', pct:52, fill:'fill-1', color:'var(--sev-1)' },
@@ -56,7 +58,8 @@ const CITIES = {
     name:'Miami', state:'Florida', abbr:'FL',
     levelLabel:'Warning', levelClass:'sev-2',
     sub:'Heat & humidity warning · 1 alert active',
-    exposure:'$27,200',
+    exposure:'$27,200', opsAffected:4, staffAtRisk:61,
+    topAction:'Adjust shifts — early start, midday pause',
     risks:[
       { name:'Extreme Heat',   pct:82, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Humidity Index', pct:76, fill:'fill-2', color:'var(--sev-2)' },
@@ -81,7 +84,8 @@ const CITIES = {
     name:'Seattle', state:'Washington', abbr:'WA',
     levelLabel:'Watch', levelClass:'sev-1',
     sub:'Rain & low visibility watch',
-    exposure:'$9,800',
+    exposure:'$9,800', opsAffected:1, staffAtRisk:9,
+    topAction:'Issue visibility advisory to field crews',
     risks:[
       { name:'Heavy Rain',     pct:55, fill:'fill-1', color:'var(--sev-1)' },
       { name:'Low Visibility', pct:48, fill:'fill-1', color:'var(--sev-1)' },
@@ -106,7 +110,8 @@ const CITIES = {
     name:'New York', state:'New York', abbr:'NY',
     levelLabel:'Advisory', levelClass:'sev-0',
     sub:'Minor advisories only · No alerts',
-    exposure:'$4,200',
+    exposure:'$4,200', opsAffected:0, staffAtRisk:0,
+    topAction:'No action required — monitor conditions',
     risks:[
       { name:'Wind Gusts', pct:35, fill:'fill-0',  color:'var(--sev-0)' },
       { name:'Light Rain', pct:28, fill:'fill-ok', color:'var(--bg-success)' },
@@ -169,6 +174,117 @@ Chicago is the primary driver. If the flood clears by Wednesday (as modeled), ne
 };
 
 const FALLBACK = `I've analyzed conditions across your 5 Meridian Logistics locations. Elevated risk in the Midwest and Southeast corridors. Priority actions: reroute Chicago I-90/94 shipments (Tue–Wed) and activate Miami heat protocol (Thu–Fri). Want specific route recommendations or operational alerts?`;
+
+const ALERTS = [
+  {
+    id: 1, cityKey: 'chicago', sevClass: 'sev-4', sevLabel: 'EXTREME',
+    type: 'Flood Warning',
+    desc: 'Flash flooding expected on I-90/94 corridor Tue Apr 21–Wed Apr 22. Three shipments at risk of 4–6 hr delays.',
+    time: '2 hrs ago',
+    action: 'Reroute shipments',
+    actionMsg: 'Show me contingency options',
+  },
+  {
+    id: 2, cityKey: 'dallas', sevClass: 'sev-2', sevLabel: 'WARNING',
+    type: 'Extreme Heat',
+    desc: '104°F forecast Thursday–Friday. Exceeds mandatory safety threshold (91°F). Outdoor ops at distribution center must pause.',
+    time: '5 hrs ago',
+    action: 'Activate heat protocol',
+    actionMsg: 'Draft an alert for my ops team',
+  },
+  {
+    id: 3, cityKey: 'miami', sevClass: 'sev-2', sevLabel: 'WARNING',
+    type: 'Heat & Humidity',
+    desc: 'Heat index reaching 94°F Thu–Fri. 61 staff members scheduled for outdoor operations during peak hours.',
+    time: '5 hrs ago',
+    action: 'Adjust schedule',
+    actionMsg: 'Draft an alert for my ops team',
+  },
+];
+
+// ── ALERTS VIEW ───────────────────────────────────────────────────────────
+let alertsViewOpen = false;
+
+function toggleAlertsView() {
+  alertsViewOpen = !alertsViewOpen;
+  document.getElementById('rp-normal').style.display = alertsViewOpen ? 'none' : 'flex';
+  document.getElementById('rp-alerts').style.display  = alertsViewOpen ? 'flex' : 'none';
+  const chip = document.getElementById('alert-chip');
+  chip.classList.toggle('active', alertsViewOpen);
+}
+
+function buildAlerts() {
+  document.getElementById('alerts-list').innerHTML = ALERTS.map(a => {
+    const c = CITIES[a.cityKey];
+    return `
+    <div class="alert-item">
+      <div class="alert-item-top">
+        <span class="alert-sev-badge ${a.sevClass}">${a.sevLabel}</span>
+        <span class="alert-city-name">${c.name}, ${c.abbr}</span>
+        <span class="alert-time">${a.time}</span>
+      </div>
+      <div class="alert-type">${a.type}</div>
+      <div class="alert-desc">${a.desc}</div>
+      <button class="alert-action-btn" onclick="handleAlertAction('${a.actionMsg}')">${a.action} →</button>
+    </div>`;
+  }).join('');
+}
+
+function handleAlertAction(msg) {
+  toggleAlertsView();
+  const drawer = document.getElementById('ai-drawer');
+  if (!drawer.classList.contains('open')) toggleAiDrawer();
+  setTimeout(() => sendChip(msg), 250);
+}
+
+// ── LOCATIONS LIST ────────────────────────────────────────────────────────
+function buildLocList() {
+  document.getElementById('loc-list').innerHTML = Object.entries(CITIES).map(([key, c]) => {
+    const topRisk = c.risks[0];
+    const isSelected = key === current;
+    return `
+    <div class="loc-card${isSelected ? ' selected' : ''}" onclick="selectCity('${key}')">
+      <span class="loc-sev-badge ${c.levelClass}"></span>
+      <div class="loc-card-info">
+        <div class="loc-card-name">${c.name}, ${c.abbr}</div>
+        <div class="loc-card-sub">${topRisk.name}</div>
+      </div>
+      <div class="loc-card-right">
+        <span class="loc-card-score ${c.levelClass}">${topRisk.pct}</span>
+        <span class="loc-card-lbl">${c.levelLabel.replace(' Risk','')}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── BUSINESS IMPACT ───────────────────────────────────────────────────────
+function buildImpact(c) {
+  const primaryRisk = c.risks[0];
+  document.getElementById('impact-grid').innerHTML = `
+    <div class="impact-tile">
+      <div class="impact-tile-val">${c.exposure}</div>
+      <div class="impact-tile-lbl">Est. Exposure</div>
+    </div>
+    <div class="impact-tile">
+      <div class="impact-tile-val${c.opsAffected > 0 ? ' sev-2' : ' sev-ok'}">${c.opsAffected}</div>
+      <div class="impact-tile-lbl">Ops at Risk</div>
+    </div>
+    <div class="impact-tile">
+      <div class="impact-tile-val${c.staffAtRisk > 0 ? ' sev-1' : ' sev-ok'}">${c.staffAtRisk}</div>
+      <div class="impact-tile-lbl">Staff at Risk</div>
+    </div>
+    <div class="impact-tile">
+      <div class="impact-tile-val impact-tile-risk ${primaryRisk.fill}">${primaryRisk.pct}</div>
+      <div class="impact-tile-lbl">Primary Risk Score</div>
+    </div>`;
+  const btn = document.getElementById('impact-action-btn');
+  btn.textContent = '⚡ ' + c.topAction;
+  btn.onclick = () => {
+    const drawer = document.getElementById('ai-drawer');
+    if (!drawer.classList.contains('open')) toggleAiDrawer();
+    setTimeout(() => sendChip('Show me contingency options'), 200);
+  };
+}
 
 // ── AI DRAWER ─────────────────────────────────────────────────────────────
 function toggleAiDrawer() {
@@ -268,6 +384,8 @@ function selectCity(key) {
   lvl.className = c.levelClass;
 
   buildRiskBars(c);
+  buildImpact(c);
+  buildLocList();
 
   document.getElementById('tl-city-name').textContent = `${c.name}, ${c.abbr}`;
   document.getElementById('tl-city-sub').textContent = c.sub;
@@ -392,6 +510,8 @@ function copyAlert(btn) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
+document.getElementById('rp-alerts').style.display = 'none';
+buildAlerts();
 selectCity('chicago');
 
 setTimeout(() => appendMsg(`Good morning! I've analyzed weather conditions across your <strong>5 active Meridian Logistics locations</strong>. There are <strong>3 alerts</strong> requiring attention today.`, 'ai'), 220);
