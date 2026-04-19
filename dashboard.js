@@ -112,6 +112,14 @@ const CITIES = {
   },
 };
 
+const CITY_DEEP_DIVES = {
+  chicago:  `<strong>Chicago, Illinois — Full Risk Breakdown</strong><br><br><strong>Flooding (94/100 — Extreme):</strong> The Chicago River is forecast to crest at 6.8 ft by Tuesday — 1.8 ft above flood stage. The I-90/94 corridor faces a 78% probability of lane closures Tuesday–Wednesday.<br><br><strong>Extreme Wind (67/100):</strong> Sustained 35–45 mph gusts expected Wednesday afternoon. Crane operations and rooftop work should be suspended.<br><br><strong>Severe Storm (58/100):</strong> Embedded rotation detected in Wednesday's system. Tornado watch possible — monitor NWS alerts.<br><br><strong>Recommended actions:</strong><ul><li>Reroute 3 I-90/94 shipments via I-80 S — saves est. $18,000</li><li>Notify Chicago hub ops team by EOD Monday</li><li>Pre-position recovery assets at Joliet staging area</li></ul>`,
+  dallas:   `<strong>Dallas, Texas — Full Risk Breakdown</strong><br><br><strong>Extreme Heat (78/100 — Warning):</strong> Heat index reaching 104°F Thursday–Friday. OSHA heat illness threshold (91°F) is exceeded for 6+ consecutive hours both days.<br><br><strong>Flash Flooding (52/100):</strong> Afternoon convective storms likely Friday — typical 30–60 min flash flood warning windows. Low-lying staging areas at risk.<br><br><strong>High Wind (40/100):</strong> Pre-storm wind gusts up to 28 mph Wednesday. Minor disruption to loading dock operations.<br><br><strong>Recommended actions:</strong><ul><li>Activate Heat Protocol — mandatory water breaks every 30 min</li><li>Shift outdoor ops to 5AM–11AM Thursday & Friday</li><li>Pre-clear drains at the Oak Cliff staging yard</li></ul>`,
+  miami:    `<strong>Miami, Florida — Full Risk Breakdown</strong><br><br><strong>Extreme Heat (82/100 — Warning):</strong> Heat index 94°F Thursday–Friday — 3°F above your company's 91°F mandatory safety threshold. Outdoor worker exposure must be managed.<br><br><strong>Humidity Index (76/100):</strong> Relative humidity forecast at 88–92% — wet bulb temperature exceeds safe working thresholds for heavy labor.<br><br><strong>Tropical Storm (44/100):</strong> Disturbance in the Atlantic with 35% development probability by the weekend. Monitor advisory updates.<br><br><strong>Recommended actions:</strong><ul><li>Pause outdoor ops 12PM–4PM Thursday & Friday</li><li>Begin early shifts at 5AM to maximize cooler morning hours</li><li>Activate Fort Lauderdale backup hub if heat index exceeds 96°F</li></ul>`,
+  seattle:  `<strong>Seattle, Washington — Full Risk Breakdown</strong><br><br><strong>Heavy Rain (55/100 — Watch):</strong> Persistent rain system through Wednesday — 1.8–2.4 inches cumulative. Roof drainage and outdoor inventory exposure should be checked.<br><br><strong>Low Visibility (48/100):</strong> Dense fog advisory through Tuesday morning — visibility under 0.25 miles on SR-99 and I-5. Delivery ETA variance: +45–90 min.<br><br><strong>Wind Gusts (32/100):</strong> Occasional 22 mph gusts — low impact but monitor for elevated work.<br><br><strong>Recommended actions:</strong><ul><li>Issue visibility advisory to all field crews today</li><li>Delay non-critical outdoor operations through Wednesday</li><li>Adjust customer delivery ETAs for Tuesday AM routes</li></ul>`,
+  newyork:  `<strong>New York, New York — Full Risk Breakdown</strong><br><br><strong>Wind Gusts (35/100 — Advisory):</strong> Brief gusts 18–24 mph Monday — minor disruption to elevated loading operations. No structural risk.<br><br><strong>Light Rain (28/100):</strong> Passing showers Wednesday afternoon — 0.3–0.5 inches. Normal operations maintained with standard wet-weather protocols.<br><br><strong>Fog (20/100):</strong> Patchy morning fog Monday — clears by 9AM. Minimal delivery impact.<br><br><strong>Outlook:</strong> New York is your lowest-risk hub this week. No action items required — conditions remain favorable through the weekend. Continue standard monitoring.`,
+};
+
 const RESPONSES = {
   "What's my highest risk location?": `<strong>Chicago, IL</strong> is your highest-risk location this week — Extreme flood risk score of <strong>94/100</strong>. Three shipments are routed through the I-90/94 corridor on Tuesday and Wednesday, with a 78% disruption probability.<br><br>Dallas is second at <strong>Warning</strong> (78/100). 104°F heat is forecast Thursday, triggering mandatory safety protocols at your distribution center.`,
 
@@ -161,6 +169,18 @@ function toggleAiDrawer() {
   const isOpen = drawer.classList.toggle('open');
   btn.classList.toggle('active', isOpen);
   if (isOpen) setTimeout(() => document.getElementById('ai-input').focus(), 240);
+}
+
+function askGaleAboutCity() {
+  const drawer = document.getElementById('ai-drawer');
+  const btn    = document.getElementById('ai-toggle-btn');
+  if (!drawer.classList.contains('open')) {
+    drawer.classList.add('animated', 'open');
+    btn.classList.add('active');
+  }
+  const c = CITIES[current];
+  const q = `Give me a full risk breakdown for ${c.name}, ${c.state}`;
+  setTimeout(() => deliver(q), 280);
 }
 
 // ── CLOCK ─────────────────────────────────────────────────────────────────
@@ -400,7 +420,13 @@ function sendChip(t) { if(!busy) deliver(t); }
 function deliver(t) {
   busy = true;
   appendMsg(t, 'user'); showTyping();
-  const r = RESPONSES[t] || FALLBACK;
+  const cityMatch = t.match(/Give me a full risk breakdown for (.+?),/);
+  let r = RESPONSES[t];
+  if (!r && cityMatch) {
+    const key = Object.keys(CITIES).find(k => CITIES[k].name === cityMatch[1]);
+    r = key ? CITY_DEEP_DIVES[key] : null;
+  }
+  r = r || FALLBACK;
   setTimeout(() => { hideTyping(); appendMsg(r, 'ai'); busy = false; }, 820);
 }
 
