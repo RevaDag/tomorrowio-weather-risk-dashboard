@@ -1,22 +1,16 @@
 // ── DATA ──────────────────────────────────────────────────────────────────
-const DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-
 const CITIES = {
   chicago: {
     name:'Chicago', state:'Illinois', abbr:'IL',
     levelLabel:'Extreme Risk', levelClass:'sev-4',
     sub:'Extreme flood risk · 3 alerts active',
-    exposure:'$42,000', opsAffected:3, staffAtRisk:24,
-    topAction:'Reroute Chicago I-90/94 shipments',
+    weather:{ icon:'⛅', temp:'52 °F', condition:'Cloudy', wind:'12 mph winds' },
+    impactSub:'Extreme flood risk active',
+    insight:'Consider rerouting I-90/94 shipments Tuesday–Wednesday due to critical flood conditions in the Chicago metro area.',
     risks:[
       { name:'Flooding',     pct:94, fill:'fill-4', color:'var(--sev-4)' },
       { name:'Extreme Wind', pct:67, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Severe Storm', pct:58, fill:'fill-2', color:'var(--sev-2)' },
-    ],
-    tlRisks:[
-      { icon:'🌊', name:'Flooding',      lvl:'Extreme', cls:'sev-4' },
-      { icon:'💨', name:'High Wind',      lvl:'Warning',  cls:'sev-2' },
-      { icon:'⛈️', name:'Severe Storm',  lvl:'Warning',  cls:'sev-2' },
     ],
     outlook:[
       { day:'SUN', icon:'☀️', ct:'ct-ok' },
@@ -32,17 +26,13 @@ const CITIES = {
     name:'Dallas', state:'Texas', abbr:'TX',
     levelLabel:'Warning', levelClass:'sev-2',
     sub:'Heat warning · 1 alert active',
-    exposure:'$18,500', opsAffected:2, staffAtRisk:38,
-    topAction:'Activate heat protocol at Dallas hub',
+    weather:{ icon:'☀️', temp:'89 °F', condition:'Sunny', wind:'8 mph winds' },
+    impactSub:'Heat warning in effect',
+    insight:'Activate heat protocol for outdoor workers Thursday–Friday. Peak heat index reaches 104°F — mandatory water breaks every 30 min.',
     risks:[
       { name:'Extreme Heat',   pct:78, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Flash Flooding', pct:52, fill:'fill-1', color:'var(--sev-1)' },
       { name:'High Wind',      pct:40, fill:'fill-1', color:'var(--sev-1)' },
-    ],
-    tlRisks:[
-      { icon:'🌡️', name:'Extreme Heat',   lvl:'Warning', cls:'sev-2' },
-      { icon:'🌊', name:'Flash Flooding', lvl:'Watch',   cls:'sev-1' },
-      { icon:'💨', name:'High Wind',       lvl:'Watch',   cls:'sev-1' },
     ],
     outlook:[
       { day:'SUN', icon:'☀️', ct:'ct-ok' },
@@ -58,17 +48,13 @@ const CITIES = {
     name:'Miami', state:'Florida', abbr:'FL',
     levelLabel:'Warning', levelClass:'sev-2',
     sub:'Heat & humidity warning · 1 alert active',
-    exposure:'$27,200', opsAffected:4, staffAtRisk:61,
-    topAction:'Adjust shifts — early start, midday pause',
+    weather:{ icon:'🌤️', temp:'86 °F', condition:'Partly Cloudy', wind:'14 mph winds' },
+    impactSub:'Heat & humidity warning active',
+    insight:'94°F heat index Thursday–Friday exceeds 91°F safety threshold. Recommend early shift scheduling and pausing outdoor ops 12PM–4PM.',
     risks:[
       { name:'Extreme Heat',   pct:82, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Humidity Index', pct:76, fill:'fill-2', color:'var(--sev-2)' },
       { name:'Tropical Storm', pct:44, fill:'fill-1', color:'var(--sev-1)' },
-    ],
-    tlRisks:[
-      { icon:'🌡️', name:'Extreme Heat',   lvl:'Warning', cls:'sev-2' },
-      { icon:'💧', name:'Humidity Index', lvl:'Warning', cls:'sev-2' },
-      { icon:'🌀', name:'Tropical Storm', lvl:'Watch',   cls:'sev-1' },
     ],
     outlook:[
       { day:'SUN', icon:'⛅', ct:'ct-0'  },
@@ -84,17 +70,13 @@ const CITIES = {
     name:'Seattle', state:'Washington', abbr:'WA',
     levelLabel:'Watch', levelClass:'sev-1',
     sub:'Rain & low visibility watch',
-    exposure:'$9,800', opsAffected:1, staffAtRisk:9,
-    topAction:'Issue visibility advisory to field crews',
+    weather:{ icon:'🌧️', temp:'54 °F', condition:'Rainy', wind:'10 mph winds' },
+    impactSub:'Low visibility watch in effect',
+    insight:'Persistent rain and fog through Wednesday. Issue visibility advisory to all field crews — delay non-critical outdoor operations.',
     risks:[
       { name:'Heavy Rain',     pct:55, fill:'fill-1', color:'var(--sev-1)' },
       { name:'Low Visibility', pct:48, fill:'fill-1', color:'var(--sev-1)' },
       { name:'Wind Gusts',     pct:32, fill:'fill-0', color:'var(--sev-0)' },
-    ],
-    tlRisks:[
-      { icon:'🌧️', name:'Heavy Rain',     lvl:'Watch',    cls:'sev-1' },
-      { icon:'🌫️', name:'Low Visibility', lvl:'Watch',    cls:'sev-1' },
-      { icon:'💨', name:'Wind Gusts',      lvl:'Advisory', cls:'sev-0' },
     ],
     outlook:[
       { day:'SUN', icon:'⛅', ct:'ct-0'  },
@@ -110,17 +92,13 @@ const CITIES = {
     name:'New York', state:'New York', abbr:'NY',
     levelLabel:'Advisory', levelClass:'sev-0',
     sub:'Minor advisories only · No alerts',
-    exposure:'$4,200', opsAffected:0, staffAtRisk:0,
-    topAction:'No action required — monitor conditions',
+    weather:{ icon:'🌤️', temp:'61 °F', condition:'Mostly Clear', wind:'7 mph winds' },
+    impactSub:'No active insights',
+    insight:'Conditions are favorable across all New York operations. Continue monitoring wind gusts — brief advisory may persist through Monday.',
     risks:[
       { name:'Wind Gusts', pct:35, fill:'fill-0',  color:'var(--sev-0)' },
       { name:'Light Rain', pct:28, fill:'fill-ok', color:'var(--bg-success)' },
       { name:'Fog',        pct:20, fill:'fill-ok', color:'var(--bg-success)' },
-    ],
-    tlRisks:[
-      { icon:'💨', name:'Wind Gusts', lvl:'Advisory', cls:'sev-0' },
-      { icon:'🌧️', name:'Light Rain', lvl:'Clear',    cls:'sev-ok' },
-      { icon:'🌫️', name:'Fog',        lvl:'Clear',    cls:'sev-ok' },
     ],
     outlook:[
       { day:'SUN', icon:'☀️', ct:'ct-ok' },
@@ -155,7 +133,7 @@ MIAMI (Warning):
 Unmitigated exposure: $69,200
 With recommended actions: ~$14,500
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Generated by Tomorrow.io AI Risk Advisor</div><button class="copy-btn" onclick="copyAlert(this)">Copy Alert</button>`,
+Generated by Tomorrow.io / Gale AI</div><button class="copy-btn" onclick="copyAlert(this)">Copy Alert</button>`,
 
   "Compare this week vs last week": `Week-over-week for Meridian Logistics:<br><br>
 <strong>Flooding:</strong> ↑ +34% — Chicago escalated Warning → Extreme<br>
@@ -174,117 +152,6 @@ Chicago is the primary driver. If the flood clears by Wednesday (as modeled), ne
 };
 
 const FALLBACK = `I've analyzed conditions across your 5 Meridian Logistics locations. Elevated risk in the Midwest and Southeast corridors. Priority actions: reroute Chicago I-90/94 shipments (Tue–Wed) and activate Miami heat protocol (Thu–Fri). Want specific route recommendations or operational alerts?`;
-
-const ALERTS = [
-  {
-    id: 1, cityKey: 'chicago', sevClass: 'sev-4', sevLabel: 'EXTREME',
-    type: 'Flood Warning',
-    desc: 'Flash flooding expected on I-90/94 corridor Tue Apr 21–Wed Apr 22. Three shipments at risk of 4–6 hr delays.',
-    time: '2 hrs ago',
-    action: 'Reroute shipments',
-    actionMsg: 'Show me contingency options',
-  },
-  {
-    id: 2, cityKey: 'dallas', sevClass: 'sev-2', sevLabel: 'WARNING',
-    type: 'Extreme Heat',
-    desc: '104°F forecast Thursday–Friday. Exceeds mandatory safety threshold (91°F). Outdoor ops at distribution center must pause.',
-    time: '5 hrs ago',
-    action: 'Activate heat protocol',
-    actionMsg: 'Draft an alert for my ops team',
-  },
-  {
-    id: 3, cityKey: 'miami', sevClass: 'sev-2', sevLabel: 'WARNING',
-    type: 'Heat & Humidity',
-    desc: 'Heat index reaching 94°F Thu–Fri. 61 staff members scheduled for outdoor operations during peak hours.',
-    time: '5 hrs ago',
-    action: 'Adjust schedule',
-    actionMsg: 'Draft an alert for my ops team',
-  },
-];
-
-// ── ALERTS VIEW ───────────────────────────────────────────────────────────
-let alertsViewOpen = false;
-
-function toggleAlertsView() {
-  alertsViewOpen = !alertsViewOpen;
-  document.getElementById('rp-normal').style.display = alertsViewOpen ? 'none' : 'flex';
-  document.getElementById('rp-alerts').style.display  = alertsViewOpen ? 'flex' : 'none';
-  const chip = document.getElementById('alert-chip');
-  chip.classList.toggle('active', alertsViewOpen);
-}
-
-function buildAlerts() {
-  document.getElementById('alerts-list').innerHTML = ALERTS.map(a => {
-    const c = CITIES[a.cityKey];
-    return `
-    <div class="alert-item">
-      <div class="alert-item-top">
-        <span class="alert-sev-badge ${a.sevClass}">${a.sevLabel}</span>
-        <span class="alert-city-name">${c.name}, ${c.abbr}</span>
-        <span class="alert-time">${a.time}</span>
-      </div>
-      <div class="alert-type">${a.type}</div>
-      <div class="alert-desc">${a.desc}</div>
-      <button class="alert-action-btn" onclick="handleAlertAction('${a.actionMsg}')">${a.action} →</button>
-    </div>`;
-  }).join('');
-}
-
-function handleAlertAction(msg) {
-  toggleAlertsView();
-  const drawer = document.getElementById('ai-drawer');
-  if (!drawer.classList.contains('open')) toggleAiDrawer();
-  setTimeout(() => sendChip(msg), 250);
-}
-
-// ── LOCATIONS LIST ────────────────────────────────────────────────────────
-function buildLocList() {
-  document.getElementById('loc-list').innerHTML = Object.entries(CITIES).map(([key, c]) => {
-    const topRisk = c.risks[0];
-    const isSelected = key === current;
-    return `
-    <div class="loc-card${isSelected ? ' selected' : ''}" onclick="selectCity('${key}')">
-      <span class="loc-sev-badge ${c.levelClass}"></span>
-      <div class="loc-card-info">
-        <div class="loc-card-name">${c.name}, ${c.abbr}</div>
-        <div class="loc-card-sub">${topRisk.name}</div>
-      </div>
-      <div class="loc-card-right">
-        <span class="loc-card-score ${c.levelClass}">${topRisk.pct}</span>
-        <span class="loc-card-lbl">${c.levelLabel.replace(' Risk','')}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── BUSINESS IMPACT ───────────────────────────────────────────────────────
-function buildImpact(c) {
-  const primaryRisk = c.risks[0];
-  document.getElementById('impact-grid').innerHTML = `
-    <div class="impact-tile">
-      <div class="impact-tile-val">${c.exposure}</div>
-      <div class="impact-tile-lbl">Est. Exposure</div>
-    </div>
-    <div class="impact-tile">
-      <div class="impact-tile-val${c.opsAffected > 0 ? ' sev-2' : ' sev-ok'}">${c.opsAffected}</div>
-      <div class="impact-tile-lbl">Ops at Risk</div>
-    </div>
-    <div class="impact-tile">
-      <div class="impact-tile-val${c.staffAtRisk > 0 ? ' sev-1' : ' sev-ok'}">${c.staffAtRisk}</div>
-      <div class="impact-tile-lbl">Staff at Risk</div>
-    </div>
-    <div class="impact-tile">
-      <div class="impact-tile-val impact-tile-risk ${primaryRisk.fill}">${primaryRisk.pct}</div>
-      <div class="impact-tile-lbl">Primary Risk Score</div>
-    </div>`;
-  const btn = document.getElementById('impact-action-btn');
-  btn.textContent = '⚡ ' + c.topAction;
-  btn.onclick = () => {
-    const drawer = document.getElementById('ai-drawer');
-    if (!drawer.classList.contains('open')) toggleAiDrawer();
-    setTimeout(() => sendChip('Show me contingency options'), 200);
-  };
-}
 
 // ── AI DRAWER ─────────────────────────────────────────────────────────────
 function toggleAiDrawer() {
@@ -305,100 +172,109 @@ function updateClock() {
 }
 updateClock(); setInterval(updateClock, 1000);
 
-function updateScrubber() {
-  const n = new Date();
-  document.getElementById('tl-scrubber-label').textContent =
-    n.toLocaleString('en-US', { day:'numeric', month:'short',
-      hour:'numeric', minute:'2-digit', hour12:true });
+// ── GANTT DATE GENERATION ─────────────────────────────────────────────────
+const GANTT_START = new Date('2026-04-19'); // Sun Apr 19
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MON_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function buildGanttDates() {
+  const grid = document.getElementById('gantt-dates-grid');
+  const today = new Date();
+  grid.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(GANTT_START);
+    d.setDate(d.getDate() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    const cell = document.createElement('div');
+    cell.className = 'gantt-date-cell' + (isToday ? ' today-date' : '');
+    cell.textContent = DAY_NAMES[d.getDay()] + ' ' + MON_NAMES[d.getMonth()] + ' ' + d.getDate();
+    grid.appendChild(cell);
+  }
 }
-updateScrubber(); setInterval(updateScrubber, 30000);
+
+function positionScrubber() {
+  const scrubber = document.getElementById('gantt-scrubber');
+  const area = document.getElementById('gantt-blocks-area');
+  const pill = document.getElementById('gantt-time-pill');
+  if (!scrubber || !area) return;
+
+  const now = new Date();
+
+  // Update pill label
+  pill.textContent = now.toLocaleString('en-US', { day:'numeric', month:'short',
+    hour:'numeric', minute:'2-digit', hour12:true });
+
+  // Calculate position: which day (0-5) + fraction of that day
+  const msFromStart = now - GANTT_START;
+  const dayIndex = Math.max(0, Math.min(5, Math.floor(msFromStart / 86400000)));
+  const dayFrac = (now.getHours() + now.getMinutes() / 60) / 24;
+
+  const areaRect = area.getBoundingClientRect();
+  const colW = areaRect.width / 6;
+  const leftInArea = (dayIndex + dayFrac) * colW;
+
+  // area starts at 130px (gantt-loc-col width) from the bp-gantt left
+  scrubber.style.left = (130 + leftInArea) + 'px';
+}
+
+function updateScrubber() {
+  positionScrubber();
+}
 
 // ── CITY SELECT ────────────────────────────────────────────────────────────
 let current = 'chicago';
 const leafletMarkers = {};
-
-function buildTimeline(c) {
-  const today = new Date().getDay();
-
-  document.getElementById('tl-day-headers').innerHTML = c.outlook.map((d, i) => {
-    const isToday = i === today;
-    return `<div class="tl-day-hdr${isToday ? ' today' : ''}">
-      ${d.day}${isToday ? '<div class="tl-today-line"></div>' : ''}
-    </div>`;
-  }).join('');
-
-  const ROWS = [
-    c.outlook,
-    c.outlook.map((d,i) => ({ ...d, icon: ['☀️','☀️','🌡️','🌡️','⛈️','🌧️','⛅'][i], ct: ['ct-ok','ct-ok','ct-2','ct-2','ct-4','ct-1','ct-0'][i] })),
-    c.outlook.map((d,i) => ({ ...d, icon: ['⛅','💨','💨','⛅','⛅','☀️','☀️'][i], ct: ['ct-0','ct-1','ct-1','ct-0','ct-0','ct-ok','ct-ok'][i] })),
-    c.outlook.map((d,i) => ({ ...d, icon: ['☀️','☀️','☀️','☀️','☀️','☀️','☀️'][i], ct: ['ct-ok','ct-ok','ct-ok','ct-ok','ct-ok','ct-ok','ct-ok'][i] })),
-    c.outlook.map((d,i) => ({ ...d, icon: ['🌫️','⛅','☀️','☀️','⛅','☀️','☀️'][i], ct: ['ct-0','ct-0','ct-ok','ct-ok','ct-0','ct-ok','ct-ok'][i] })),
-  ];
-
-  document.getElementById('tl-grid-rows').innerHTML =
-    ROWS.flatMap(row => row.map((d, i) => {
-      const isToday = i === today;
-      return `<div class="tl-cell ${d.ct}${isToday ? ' today-col' : ''}">${d.icon}</div>`;
-    })).join('');
-}
-
-function buildRiskBars(c) {
-  document.getElementById('city-risk-bars').innerHTML = c.risks.map(r => `
-    <div class="rbar">
-      <div class="rbar-head">
-        <span class="rbar-name" style="color:${r.color}">${r.name}</span>
-        <span class="rbar-score" style="color:${r.color}">${r.pct}/100</span>
-      </div>
-      <div class="rbar-track">
-        <div class="rbar-fill ${r.fill}" style="width:0" data-w="${r.pct}%"></div>
-      </div>
-    </div>
-  `).join('');
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.rbar-fill').forEach(el => { el.style.width = el.dataset.w; });
-  });
-}
-
-function buildTlRisks(c) {
-  document.getElementById('tl-risk-rows').innerHTML = c.tlRisks.map(r => `
-    <div class="tl-risk-row">
-      <div class="tl-risk-icon">${r.icon}</div>
-      <div class="tl-risk-info">
-        <div class="tl-risk-name">${r.name}</div>
-        <div class="tl-risk-lvl ${r.cls}">${r.lvl}</div>
-      </div>
-    </div>
-  `).join('');
-}
+let cityPin = null;
 
 function selectCity(key) {
   current = key;
   const c = CITIES[key];
 
-  const drawer = document.getElementById('ai-drawer');
-  if (drawer.classList.contains('open')) toggleAiDrawer();
+  // Topbar breadcrumb tab
+  document.getElementById('topbar-tab-text').textContent = `${c.name}, ${c.state}`;
 
-  document.getElementById('location-pill-text').textContent = `${c.name}, ${c.abbr}`;
+  // Right panel — location
+  document.getElementById('rp-loc-name').textContent = `${c.name}, ${c.state}`;
 
-  document.getElementById('city-name').textContent = c.name;
-  document.getElementById('city-state').textContent = c.state;
-  const lvl = document.getElementById('city-level');
-  lvl.textContent = '● ' + c.levelLabel;
-  lvl.className = c.levelClass;
+  // Right panel — weather
+  document.getElementById('rp-weather-icon').textContent = c.weather.icon;
+  document.getElementById('rp-temp').textContent = c.weather.temp;
+  document.getElementById('rp-condition').textContent = c.weather.condition;
+  document.getElementById('rp-wind').textContent = c.weather.wind;
 
-  buildRiskBars(c);
-  buildImpact(c);
-  buildLocList();
+  // Right panel — impact & insights
+  document.getElementById('rp-impact-sub').textContent = c.impactSub;
+  document.getElementById('rp-insights-body').textContent = c.insight;
 
-  document.getElementById('tl-city-name').textContent = `${c.name}, ${c.abbr}`;
-  document.getElementById('tl-city-sub').textContent = c.sub;
-  buildTlRisks(c);
-  buildTimeline(c);
+  // Gantt label
+  document.getElementById('gantt-loc-label').textContent = `${c.name}, ${c.abbr}`;
 
+  // Move/update blue pin marker on map
+  const coords = CITY_COORDS[key].latlng;
+  if (cityPin) cityPin.remove();
+  cityPin = L.marker(coords, { icon: pinIcon })
+    .addTo(leafletMap)
+    .bindTooltip(`${c.name}, ${c.abbr}`, {
+      permanent: true, direction: 'bottom', offset: [0, 6],
+      className: 'city-pin-label',
+    });
+
+  // Pan map to selected city
+  leafletMap.panTo(coords, { animate: true, duration: 0.5 });
+
+  // Update risk circle styles
   Object.entries(leafletMarkers).forEach(([k, m]) => {
     const isSelected = k === key;
-    m.dot.setStyle({ radius: isSelected ? 11 : 8, weight: isSelected ? 2 : 1.5, opacity: isSelected ? 1 : 0.55, fillOpacity: isSelected ? 1 : 0.65 });
-    m.ring.setStyle({ opacity: isSelected ? 0.35 : 0.18, fillOpacity: isSelected ? 0.12 : 0.06 });
+    m.dot.setStyle({
+      radius: isSelected ? 11 : 8,
+      weight: isSelected ? 2 : 1.5,
+      opacity: isSelected ? 1 : 0.55,
+      fillOpacity: isSelected ? 1 : 0.65,
+    });
+    m.ring.setStyle({
+      opacity: isSelected ? 0.35 : 0.18,
+      fillOpacity: isSelected ? 0.12 : 0.06,
+    });
   });
 }
 
@@ -416,9 +292,10 @@ const leafletMap = L.map('leaflet-map', {
   zoom: 4,
   zoomControl: true,
   attributionControl: true,
-}).setView([38, -96], 4);
+});
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+// CartoDB Positron — light tiles, no API key
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
   attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
   subdomains: 'abcd',
   maxZoom: 19,
@@ -426,45 +303,68 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 leafletMap.zoomControl.setPosition('bottomright');
 
+// Custom blue pin icon for selected city
+const pinIcon = L.divIcon({
+  html: `<svg width="22" height="30" viewBox="0 0 22 30" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11 0C4.93 0 0 4.93 0 11 0 19.25 11 30 11 30s11-10.75 11-19C22 4.93 17.07 0 11 0z" fill="#0072f5"/>
+    <circle cx="11" cy="11" r="4.5" fill="white"/>
+  </svg>`,
+  className: '',
+  iconSize: [22, 30],
+  iconAnchor: [11, 30],
+  tooltipAnchor: [0, 4],
+});
+
+// Inject pin label tooltip style
+const tipStyle = document.createElement('style');
+tipStyle.textContent = `
+.city-pin-label {
+  background: rgba(19,18,36,0.9) !important;
+  border: 1px solid #56546e !important;
+  border-radius: 4px !important; color: #f4f4f4 !important;
+  font-family: "Muli", sans-serif !important; font-size: 11px !important;
+  font-weight: 700 !important; padding: 3px 9px !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4) !important;
+}
+.city-pin-label::before { display: none !important; }
+.leaflet-tooltip-bottom.city-pin-label::before { display: none !important; }
+.leaflet-city-tip {
+  background: rgba(19,18,36,0.9) !important; border: 1px solid #56546e !important;
+  border-radius: 4px !important; color: #f4f4f4 !important;
+  font-family: "Muli", sans-serif !important; font-size: 11px !important;
+  font-weight: 700 !important; padding: 2px 8px !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35) !important;
+}
+.leaflet-city-tip::before { display: none !important; }`;
+document.head.appendChild(tipStyle);
+
+// Place risk overlay circles for all 5 cities
 Object.entries(CITY_COORDS).forEach(([key, cfg]) => {
   const ring = L.circle(cfg.latlng, {
     radius: cfg.radius,
-    color: cfg.color,
-    weight: 1,
-    fillColor: cfg.color,
-    fillOpacity: 0.08,
-    opacity: 0.25,
+    color: cfg.color, weight: 1,
+    fillColor: cfg.color, fillOpacity: 0.08, opacity: 0.25,
     interactive: false,
   }).addTo(leafletMap);
 
   const dot = L.circleMarker(cfg.latlng, {
-    radius: 9,
-    color: '#fff',
-    weight: 1.5,
-    fillColor: cfg.color,
-    fillOpacity: 1,
+    radius: 9, color: '#fff', weight: 1.5,
+    fillColor: cfg.color, fillOpacity: 1,
   }).addTo(leafletMap);
 
   dot.bindTooltip(CITIES[key].name + ', ' + CITIES[key].abbr, {
-    direction: 'top', offset: [0, -10],
-    className: 'leaflet-city-tip',
+    direction: 'top', offset: [0, -10], className: 'leaflet-city-tip',
   });
 
   dot.on('click', () => selectCity(key));
-
   leafletMarkers[key] = { dot, ring };
 });
 
-const tipStyle = document.createElement('style');
-tipStyle.textContent = `.leaflet-city-tip {
-  background: #2b2949 !important; border: 1px solid #56546e !important;
-  border-radius: 4px !important; color: #f4f4f4 !important;
-  font-family: "Muli", sans-serif !important; font-size: 12px !important;
-  font-weight: 700 !important; padding: 3px 9px !important;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.4) !important;
-}
-.leaflet-city-tip::before { display: none !important; }`;
-document.head.appendChild(tipStyle);
+// Hide "Loading map layers" once tiles finish
+leafletMap.on('load', () => {
+  const el = document.getElementById('map-loading-text');
+  if (el) el.style.display = 'none';
+});
 
 // ── CHAT ──────────────────────────────────────────────────────────────────
 let busy = false;
@@ -513,10 +413,15 @@ function copyAlert(btn) {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-document.getElementById('rp-alerts').style.display = 'none';
-buildAlerts();
+buildGanttDates();
 selectCity('chicago');
+requestAnimationFrame(() => {
+  leafletMap.invalidateSize();
+  positionScrubber();
+});
+setInterval(updateScrubber, 30000);
 
+// Pre-loaded chat messages
 setTimeout(() => appendMsg(`Good morning! I've analyzed weather conditions across your <strong>5 active Meridian Logistics locations</strong>. There are <strong>3 alerts</strong> requiring attention today.`, 'ai'), 220);
 setTimeout(() => appendMsg(`<strong>Chicago (Extreme):</strong> Flood risk escalated to 94/100 overnight — highest in your network. I recommend rerouting the <strong>3 shipments</strong> on the I-90/94 corridor Tuesday–Wednesday. Estimated disruption savings: <strong>$18,000</strong>.`, 'ai'), 640);
 setTimeout(() => appendMsg(`<strong>Miami (Warning):</strong> 94°F heat index forecast Thursday–Friday. Policy triggers safety protocols at 91°F — recommend <strong>early shift scheduling</strong> and pausing outdoor ops 12PM–4PM both days.`, 'ai'), 1060);

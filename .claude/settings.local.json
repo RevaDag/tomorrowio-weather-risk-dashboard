@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start *)",
+      "Bash(gh repo *)",
+      "Bash(git add *)"
+    ]
+  }
+}
