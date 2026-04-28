@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tomorrow.io PM Assignment — Yam Cohen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Muli:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────── */
+:root {
+  --bg-0: #06051e;
+  --bg-1: #131224;
+  --bg-2: #1e2036;
+  --bg-3: #2b2949;
+  --c1: #f4f4f4;
+  --c2: #a8a8a8;
+  --c3: #888888;
+  --c4: #575757;
+  --b1: #43415e;
+  --b2: #302f4f;
+  --accent: #0072f5;
+  --accent-d: rgba(0,114,245,0.15);
+  --hi: rgb(150,147,212);
+  --hi-d: rgba(150,147,212,0.12);
+  --ok: #4dceb0;
+  --warn: #ff705c;
+  --grad: linear-gradient(90deg,#ff705c,#ec7172 17%,#ba74ac 53%,#7479ff);
+  --s0: #8fa8ff; --s1: #ffb345; --s2: #fe782c; --s3: #ff5449;
+
+  /* fluid scale anchored to 1440px wide */
+  --fs-label: clamp(10px, 0.85vw, 13px);
+  --fs-body:  clamp(14px, 1.3vw,  18px);
+  --fs-h3:    clamp(15px, 1.45vw, 20px);
+  --fs-h2:    clamp(24px, 3.2vw,  46px);
+  --fs-h1:    clamp(36px, 5vw,    72px);
+  --pad-x:    clamp(60px, 7vw,   120px);
+  --pad-y:    clamp(44px, 5.5vh,  68px);
+  --gap:      clamp(20px, 2.5vh,  36px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg-0); color: var(--c1);
+  font-family: "Muli", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: 1.5; overflow: hidden; user-select: none;
+}
+
+/* ─── DECK ───────────────────────────────────────── */
+.deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--pad-y) var(--pad-x);
+  opacity: 0; transform: translateX(48px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none; overflow: hidden;
+}
+.slide.active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.slide.exit-l { opacity: 0; transform: translateX(-48px); pointer-events: none; }
+.slide.exit-r { opacity: 0; transform: translateX(48px);  pointer-events: none; }
+.slide::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad);
+}
+
+/* ─── CHROME ─────────────────────────────────────── */
+.progress-bar {
+  position: fixed; bottom: 0; left: 0; height: 2px;
+  background: var(--grad); transition: width 0.35s ease; z-index: 200;
+}
+.slide-counter {
+  position: fixed; bottom: clamp(14px,2vh,22px); right: clamp(16px,2vw,28px);
+  font-family: "Roboto Mono", monospace;
+  font-size: var(--fs-label); color: var(--c4); letter-spacing: 0.5px; z-index: 200;
+}
+.nav-hint {
+  position: fixed; bottom: clamp(14px,2vh,22px); left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  font-family: "Roboto Mono", monospace; font-size: var(--fs-label); color: var(--c4); z-index: 200;
+}
+.nav-hint kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; background: var(--bg-2); border: 1px solid var(--b1);
+  border-radius: 3px; font-size: 11px; color: var(--c3);
+}
+.nav-arrow {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  width: clamp(30px,2.5vw,42px); height: clamp(30px,2.5vw,42px);
+  background: var(--bg-2); border: 1px solid var(--b1); border-radius: 6px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--c3); transition: background 0.14s, color 0.14s; z-index: 200;
+}
+.nav-arrow:hover { background: var(--bg-3); color: var(--c1); }
+.nav-arrow.prev { left: clamp(8px,1vw,16px); }
+.nav-arrow.next { right: clamp(8px,1vw,16px); }
+.nav-arrow svg { width: clamp(14px,1.2vw,18px); height: clamp(14px,1.2vw,18px); }
+
+/* ─── TYPOGRAPHY ─────────────────────────────────── */
+.label {
+  font-size: var(--fs-label); font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; font-family: "Roboto Mono", monospace;
+  margin-bottom: clamp(14px,1.8vh,22px);
+}
+.label.blue   { color: var(--accent); }
+.label.purple { color: var(--hi); }
+.label.muted  { color: var(--c4); }
+
+h1 { font-size: var(--fs-h1); font-weight: 900; line-height: 1.05; letter-spacing: -1.5px; }
+h2 { font-size: var(--fs-h2); font-weight: 900; line-height: 1.1;  letter-spacing: -0.5px; margin-bottom: clamp(22px,3vh,42px); }
+h3 { font-size: var(--fs-h3); font-weight: 700; line-height: 1.25; }
+
+.grad { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.mono { font-family: "Roboto Mono", monospace; }
+
+/* ─── ANIMATIONS ─────────────────────────────────── */
+.rv { opacity: 0; transform: translateY(16px); transition: opacity 0.32s ease, transform 0.32s ease; }
+.slide.active .rv             { opacity: 1; transform: translateY(0); }
+.slide.active .rv:nth-child(1){ transition-delay: 0.06s; }
+.slide.active .rv:nth-child(2){ transition-delay: 0.13s; }
+.slide.active .rv:nth-child(3){ transition-delay: 0.20s; }
+.slide.active .rv:nth-child(4){ transition-delay: 0.27s; }
+.slide.active .rv:nth-child(5){ transition-delay: 0.34s; }
+.slide.active .rv:nth-child(6){ transition-delay: 0.41s; }
+
+/* ─── SHARED PIECES ──────────────────────────────── */
+.card {
+  background: var(--bg-2); border: 1px solid var(--b2); border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(22px,2.8vh,38px) clamp(22px,2.4vw,34px);
+}
+.card p, .card li { font-size: var(--fs-body); color: var(--c2); line-height: 1.7; }
+.card p strong, .card li strong { color: var(--c1); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 20px; padding: clamp(3px,0.4vh,5px) clamp(10px,1vw,14px);
+  font-size: clamp(11px,0.9vw,13px); font-weight: 700; flex-shrink: 0;
+}
+.chip.red    { background: rgba(255,84,73,0.10);  border: 1px solid rgba(255,84,73,0.30);  color: var(--s3); }
+.chip.amber  { background: rgba(255,179,69,0.10); border: 1px solid rgba(255,179,69,0.30); color: var(--s1); }
+.chip.blue   { background: var(--accent-d);       border: 1px solid rgba(0,114,245,0.30);  color: var(--accent); }
+.chip.plain  { background: var(--bg-3);           border: 1px solid var(--b1);             color: var(--c2); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 1 — COVER
+═══════════════════════════════════════════════════ */
+#s1 {
+  justify-content: center; align-items: flex-start;
+  background:
+    radial-gradient(ellipse 80% 60% at 72% 50%, rgba(116,121,255,0.09) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 8% 80%,  rgba(255,112,92,0.07)  0%, transparent 60%),
+    var(--bg-0);
+}
+.eyebrow {
+  font-size: var(--fs-label); font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--c3); font-family: "Roboto Mono", monospace;
+  margin-bottom: clamp(20px,2.5vh,36px);
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow::before {
+  content: ''; display: inline-block; width: 28px; height: 2px;
+  background: var(--grad); border-radius: 1px;
+}
+.cover-meta {
+  display: flex; align-items: center; gap: 18px; margin-top: clamp(8px,1vh,14px);
+  font-size: clamp(12px,1vw,15px); color: var(--c3); font-family: "Roboto Mono", monospace;
+}
+.cover-meta-div { width: 1px; height: 14px; background: var(--b1); }
+.cover-parts { display: flex; gap: clamp(10px,1.2vw,18px); margin-top: clamp(40px,5vh,70px); }
+.cpart {
+  background: var(--bg-2); border: 1px solid var(--b1); border-radius: 10px;
+  padding: clamp(14px,1.6vh,22px) clamp(18px,2vw,28px); min-width: clamp(180px,16vw,240px);
+}
+.cpart-num {
+  font-size: var(--fs-label); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--c4); font-family: "Roboto Mono", monospace; margin-bottom: 8px;
+}
+.cpart-name { font-size: clamp(14px,1.3vw,18px); font-weight: 700; }
+.cover-bg-logo {
+  position: absolute; right: 7vw; top: 50%; transform: translateY(-50%);
+  opacity: 0.04; pointer-events: none; width: clamp(240px,28vw,420px); height: auto;
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 3 — FEATURES
+═══════════════════════════════════════════════════ */
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap); align-items: stretch;
+}
+.feat-item {
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(24px,3vh,40px) clamp(22px,2.4vw,32px);
+  display: flex; gap: clamp(14px,1.4vw,22px); align-items: flex-start;
+}
+.feat-icon {
+  width: clamp(36px,3.2vw,48px); height: clamp(36px,3.2vw,48px);
+  flex-shrink: 0; border-radius: clamp(8px,0.7vw,10px);
+  display: flex; align-items: center; justify-content: center;
+}
+.feat-icon svg { width: clamp(16px,1.4vw,22px); height: clamp(16px,1.4vw,22px); }
+.feat-icon.bl { background: var(--accent-d); }
+.feat-icon.pu { background: var(--hi-d); }
+.feat-icon.am { background: rgba(255,179,69,0.12); }
+.feat-icon.gr { background: rgba(77,206,176,0.12); }
+.feat-item h3 { margin-bottom: clamp(8px,1vh,14px); }
+.feat-item p  { font-size: var(--fs-body); color: var(--c2); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 5 — CHAT
+═══════════════════════════════════════════════════ */
+.chat-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.chat-box {
+  background: var(--bg-1); border: 1px solid var(--b1);
+  border-radius: clamp(12px,1.2vw,18px);
+  padding: clamp(18px,2vh,28px) clamp(20px,2.2vw,32px);
+  display: flex; flex-direction: column; gap: clamp(14px,1.6vh,22px);
+  width: 100%; max-width: clamp(500px,52vw,740px);
+}
+.chat-hdr {
+  display: flex; align-items: center; gap: 12px;
+  padding-bottom: clamp(12px,1.4vh,18px); border-bottom: 1px solid var(--b2);
+}
+.chat-hdr-av {
+  width: clamp(30px,2.6vw,40px); height: clamp(30px,2.6vw,40px); border-radius: 50%;
+  background: var(--grad); display: flex; align-items: center; justify-content: center;
+  font-size: clamp(11px,1vw,14px); font-weight: 900; color: white; flex-shrink: 0;
+}
+.chat-hdr-name { font-size: clamp(14px,1.3vw,18px); font-weight: 700; }
+.chat-hdr-sub  { font-size: clamp(11px,0.95vw,14px); color: var(--c3); }
+.chat-msg { display: flex; gap: clamp(10px,1vw,14px); align-items: flex-start; }
+.chat-av {
+  width: clamp(28px,2.4vw,38px); height: clamp(28px,2.4vw,38px); border-radius: 50%;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  font-size: clamp(10px,0.9vw,13px); font-weight: 900;
+}
+.chat-av.ai   { background: var(--grad); color: white; }
+.chat-av.user { background: var(--accent); color: white; }
+.bubble {
+  background: var(--bg-3); border-radius: 4px clamp(10px,1vw,14px) clamp(10px,1vw,14px) clamp(10px,1vw,14px);
+  padding: clamp(10px,1.1vh,15px) clamp(14px,1.4vw,20px);
+  font-size: var(--fs-body); color: var(--c1); line-height: 1.6; max-width: 88%;
+}
+.bubble.me {
+  background: var(--accent-d); border: 1px solid rgba(0,114,245,0.25);
+  border-radius: clamp(10px,1vw,14px) clamp(10px,1vw,14px) 4px clamp(10px,1vw,14px);
+  margin-left: auto;
+}
+.ltag {
+  display: inline-block; padding: 2px clamp(6px,0.6vw,9px); border-radius: 4px;
+  font-size: clamp(12px,1.05vw,15px); font-weight: 700; margin: 0 2px;
+}
+.denver  { background: rgba(255,179,69,0.15); color: var(--s1); }
+.telaviv { background: rgba(143,168,255,0.15); color: var(--s0); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 6 — IMPACT SCORE
+═══════════════════════════════════════════════════ */
+.signal {
+  display: flex; align-items: center; gap: clamp(14px,1.4vw,22px);
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(20px,2.6vh,34px) clamp(20px,2.2vw,30px);
+  position: relative; overflow: hidden;
+}
+.signal::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 4px; }
+.signal.hi::before { background: var(--s3); }
+.signal.md::before { background: var(--s1); }
+.signal.lo::before { background: var(--s0); }
+.sig-num {
+  font-size: clamp(20px,2.2vw,30px); font-weight: 900;
+  width: clamp(36px,3.2vw,48px); flex-shrink: 0; text-align: center; line-height: 1;
+}
+.sig-num.hi { color: var(--s3); }
+.sig-num.md { color: var(--s1); }
+.sig-num.lo { color: var(--s0); }
+.sig-body { flex: 1; }
+.sig-body h3 { margin-bottom: clamp(3px,0.4vh,6px); }
+.sig-body p  { font-size: var(--fs-body); color: var(--c2); line-height: 1.5; }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: clamp(6px,0.7vh,10px); }
+.tag {
+  font-size: clamp(10px,0.85vw,12px); font-weight: 600;
+  background: var(--bg-3); border: 1px solid var(--b1);
+  border-radius: 4px; padding: 2px 7px; color: var(--c2);
+  font-family: "Roboto Mono", monospace;
+}
+.callout {
+  background: rgba(77,206,176,0.06); border: 1px solid rgba(77,206,176,0.22);
+  border-radius: clamp(6px,0.7vw,10px);
+  padding: clamp(12px,1.4vh,18px) clamp(14px,1.6vw,22px);
+  display: flex; align-items: center; gap: 12px;
+  font-size: var(--fs-body); color: var(--c2);
+}
+.callout svg { flex-shrink: 0; color: var(--ok); width: clamp(16px,1.4vw,22px); height: clamp(16px,1.4vw,22px); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 7 — DISCOVERY
+═══════════════════════════════════════════════════ */
+.badge-row {
+  display: flex; gap: clamp(36px,5vw,72px);
+  justify-content: center; margin: clamp(22px,3vh,40px) 0;
+}
+.badge-state { display: flex; flex-direction: column; align-items: center; gap: clamp(8px,1vh,14px); }
+.badge-wrap  { position: relative; }
+.badge-icon {
+  width: clamp(52px,5vw,72px); height: clamp(52px,5vw,72px);
+  background: var(--bg-2); border: 1px solid var(--b1);
+  border-radius: clamp(10px,1vw,16px);
+  display: flex; align-items: center; justify-content: center;
+}
+.badge-icon svg { width: clamp(22px,2vw,30px); height: clamp(22px,2vw,30px); color: var(--c2); }
+.bdot {
+  position: absolute; top: clamp(4px,0.4vw,6px); right: clamp(4px,0.4vw,6px);
+  width: clamp(9px,0.8vw,13px); height: clamp(9px,0.8vw,13px);
+  border-radius: 50%; border: 2px solid var(--bg-2);
+}
+.bdot.none   { background: transparent; border-color: transparent; }
+.bdot.medium { background: var(--s1); }
+.bdot.high   { background: var(--s3); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.72)} }
+.blabel {
+  font-size: clamp(11px,0.9vw,13px); font-weight: 700; text-align: center;
+  font-family: "Roboto Mono", monospace; letter-spacing: 0.5px;
+}
+.blabel.none   { color: var(--c4); }
+.blabel.medium { color: var(--s1); }
+.blabel.high   { color: var(--s3); }
+
+.rule {
+  display: flex; align-items: flex-start; gap: clamp(12px,1.2vw,18px);
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(20px,2.6vh,34px) clamp(20px,2.2vw,30px);
+}
+.rnum {
+  width: clamp(22px,2vw,30px); height: clamp(22px,2vw,30px); border-radius: 50%; flex-shrink: 0;
+  background: var(--hi-d); border: 1px solid rgba(150,147,212,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(10px,0.85vw,12px); font-weight: 700; color: var(--hi);
+  font-family: "Roboto Mono", monospace;
+}
+.rule p { font-size: var(--fs-body); color: var(--c2); line-height: 1.55; }
+.rule p strong { color: var(--c1); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — METRICS
+═══════════════════════════════════════════════════ */
+.metrics {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: var(--gap);
+}
+.mcard {
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(22px,3vh,40px) clamp(16px,1.6vw,24px);
+  display: flex; flex-direction: column; gap: clamp(8px,1vh,14px);
+}
+.mcard.hi { border-color: rgba(0,114,245,0.4); background: rgba(0,114,245,0.05); }
+.mnum {
+  font-size: clamp(32px,3.8vw,52px); font-weight: 900; line-height: 1;
+}
+.mnum.g { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.mlabel { font-size: clamp(13px,1.15vw,16px); color: var(--c2); line-height: 1.4; }
+.mqual  { font-size: clamp(10px,0.85vw,12px); color: var(--c3); font-family: "Roboto Mono", monospace; }
+.mnote {
+  background: var(--bg-1); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(18px,2.2vh,30px) clamp(20px,2.2vw,30px);
+  font-size: var(--fs-body); color: var(--c2); line-height: 1.7;
+  margin-top: var(--gap);
+}
+.mnote strong { color: var(--c1); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 9 — PROTOTYPE
+═══════════════════════════════════════════════════ */
+.zones {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: var(--gap); align-items: stretch;
+}
+.zone {
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(24px,3vh,38px) clamp(22px,2.4vw,32px);
+  display: flex; flex-direction: column; gap: clamp(10px,1.2vh,18px);
+}
+.znum {
+  width: clamp(24px,2.2vw,32px); height: clamp(24px,2.2vw,32px); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(10px,0.85vw,13px); font-weight: 900; font-family: "Roboto Mono", monospace;
+}
+.znum.z1 { background: var(--accent-d); color: var(--accent); }
+.znum.z2 { background: var(--hi-d); color: var(--hi); }
+.znum.z3 { background: rgba(77,206,176,0.12); color: var(--ok); }
+.zone p { font-size: var(--fs-body); color: var(--c2); line-height: 1.55; }
+
+.plink {
+  display: flex; align-items: center; gap: clamp(14px,1.4vw,22px);
+  background: rgba(0,114,245,0.07); border: 1px solid rgba(0,114,245,0.25);
+  border-radius: clamp(8px,0.8vw,12px); padding: clamp(14px,1.6vh,22px) clamp(18px,2vw,26px);
+  margin-top: var(--gap);
+}
+.purl { flex: 1; font-family: "Roboto Mono", monospace; font-size: clamp(13px,1.1vw,16px); color: var(--accent); }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--accent); color: white; border: none; border-radius: 6px;
+  padding: clamp(9px,1vh,13px) clamp(16px,1.6vw,22px);
+  font-size: clamp(13px,1.1vw,16px); font-weight: 700;
+  cursor: pointer; font-family: "Muli", sans-serif;
+  text-decoration: none; flex-shrink: 0; transition: background 0.14s;
+}
+.btn:hover { background: #0f7fff; }
+.btn svg { width: clamp(13px,1.1vw,16px); height: clamp(13px,1.1vw,16px); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — HOW WE BUILT IT
+═══════════════════════════════════════════════════ */
+.build-flow {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  gap: clamp(14px,1.6vw,24px); align-items: stretch;
+  margin-bottom: var(--gap);
+}
+.bstep-arrow { align-self: center; }
+.build-step {
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(22px,2.6vh,36px) clamp(20px,2.2vw,30px);
+}
+.build-step.hi {
+  border-color: rgba(116,121,255,0.35);
+  background: rgba(116,121,255,0.06);
+}
+.bstep-hdr {
+  display: flex; align-items: center; gap: clamp(8px,0.9vw,14px);
+  margin-bottom: clamp(10px,1.2vh,16px);
+}
+.bstep-num {
+  font-family: "Roboto Mono", monospace; font-size: clamp(9px,0.8vw,11px);
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--bg-3); color: var(--c3); border: 1px solid var(--b1);
+  padding: 3px 9px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;
+}
+.bstep-num.hi { background: var(--hi-d); color: var(--hi); border-color: rgba(116,121,255,0.3); }
+.bstep-hdr h3 { margin: 0; }
+.build-step p { font-size: var(--fs-body); color: var(--c2); line-height: 1.6; }
+.bstep-arrow {
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c4); flex-shrink: 0;
+}
+.bstep-arrow svg { width: clamp(20px,1.8vw,28px); height: clamp(20px,1.8vw,28px); }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 10 — CHOICES
+═══════════════════════════════════════════════════ */
+.flow {
+  display: flex; align-items: center; gap: clamp(10px,1vw,18px);
+  justify-content: center; margin: clamp(20px,2.8vh,40px) 0;
+}
+.fnode {
+  background: var(--bg-2); border: 1px solid var(--b1);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(12px,1.3vh,18px) clamp(14px,1.6vw,22px);
+  text-align: center; min-width: clamp(100px,10vw,140px);
+}
+.fnode-icon  { font-size: clamp(18px,1.8vw,26px); margin-bottom: clamp(4px,0.5vh,7px); }
+.fnode-label { font-size: clamp(12px,1vw,15px); font-weight: 700; }
+.fnode-sub   { font-size: clamp(10px,0.85vw,12px); color: var(--c3); margin-top: 3px; }
+.fnode.hi    { border-color: var(--accent); background: var(--accent-d); }
+.fnode.hi .fnode-label { color: var(--accent); }
+.farrow { color: var(--c4); font-size: clamp(16px,1.6vw,22px); flex-shrink: 0; }
+
+.cg { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); align-items: stretch; max-width: 100%; }
+.ci {
+  background: var(--bg-2); border: 1px solid var(--b2);
+  border-radius: clamp(8px,0.8vw,12px);
+  padding: clamp(22px,2.8vh,38px) clamp(22px,2.4vw,32px);
+}
+.ci.dim { opacity: 0.58; }
+.cbadge {
+  display: inline-flex; align-items: center;
+  font-size: clamp(9px,0.8vw,11px); font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px; margin-bottom: clamp(6px,0.8vh,10px);
+  font-family: "Roboto Mono", monospace;
+}
+.cbadge.p { background: var(--accent-d); color: var(--accent); }
+.cbadge.s { background: var(--bg-3); color: var(--c3); }
+.ci h3 { margin-bottom: clamp(5px,0.6vh,8px); }
+.ci p  { font-size: var(--fs-body); color: var(--c2); line-height: 1.55; }
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 8 — PART 02 DIVIDER
+═══════════════════════════════════════════════════ */
+#s8 {
+  justify-content: center; align-items: flex-start;
+  background:
+    radial-gradient(ellipse 80% 60% at 74% 50%, rgba(116,121,255,0.13) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 6% 75%,  rgba(116,121,255,0.06) 0%, transparent 60%),
+    var(--bg-0);
+}
+#s8 .part-desc {
+  font-size: var(--fs-h3); color: var(--c2); line-height: 1.55;
+  max-width: clamp(380px,44vw,580px); margin-bottom: clamp(28px,3.5vh,50px);
+}
+
+/* ═══════════════════════════════════════════════════
+   SLIDE 12 — SUMMARY
+═══════════════════════════════════════════════════ */
+#s12 {
+  justify-content: center; align-items: flex-start;
+  background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(116,121,255,0.08) 0%, transparent 70%), var(--bg-0);
+}
+.sumgrid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: clamp(16px,2vw,28px); margin-top: clamp(24px,3vh,42px);
+}
+.sumcard {
+  background: var(--bg-2); border: 1px solid var(--b1);
+  border-radius: clamp(10px,1vw,16px);
+  padding: clamp(28px,3.6vh,50px) clamp(24px,2.6vw,36px);
+  position: relative; overflow: hidden;
+}
+.sumcard::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+.sumcard.c1::after { background: var(--s2); }
+.sumcard.c2::after { background: var(--hi); }
+.sumcard.c3::after { background: var(--ok); }
+.sumcard-icon { font-size: clamp(24px,2.4vw,34px); margin-bottom: clamp(10px,1.2vh,18px); }
+.sumcard h3 { font-size: clamp(17px,1.7vw,23px); font-weight: 900; margin-bottom: clamp(6px,0.8vh,10px); }
+.sumcard p  { font-size: clamp(14px,1.2vw,17px); color: var(--c2); line-height: 1.6; }
+.tagline {
+  font-size: clamp(22px,3vw,40px); font-weight: 900; line-height: 1.18;
+  letter-spacing: -0.4px; margin-top: clamp(28px,3.5vh,50px);
+}
+.byline {
+  display: flex; align-items: center; gap: 16px;
+  margin-top: clamp(20px,2.5vh,34px);
+}
+.byline-ln { height: 1px; flex: 1; background: var(--b2); }
+.byline span { font-size: clamp(11px,0.9vw,13px); color: var(--c4); font-family: "Roboto Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ═══ 1 — COVER ════════════════════════════════ -->
+<section class="slide active" id="s1">
+  <div class="eyebrow rv">Tomorrow.io — PM Take-Home Assignment</div>
+  <h1 class="rv" style="margin-bottom:clamp(8px,1vh,14px);">
+    Weather<br><span class="grad">Intelligence</span><br>for Operators
+  </h1>
+  <div class="cover-meta rv">
+    <span>Yam Cohen</span>
+    <span class="cover-meta-div"></span>
+    <span class="mono">Senior PM</span>
+    <span class="cover-meta-div"></span>
+    <span class="mono">2026</span>
+  </div>
+  <div class="cover-parts rv">
+    <div class="cpart">
+      <div class="cpart-num">Part 01</div>
+      <div class="cpart-name">Product Brief for Engineering</div>
+    </div>
+    <div class="cpart">
+      <div class="cpart-num">Part 02</div>
+      <div class="cpart-name">Prototype — Vibe Coding</div>
+    </div>
+  </div>
+  <svg class="cover-bg-logo" viewBox="0 0 400 400" fill="none">
+    <rect width="400" height="400" rx="80" fill="white"/>
+    <path d="M100 130h200M200 130v140" stroke="white" stroke-width="30" stroke-linecap="round"/>
+  </svg>
+</section>
+
+<!-- ═══ 2 — PROBLEM ══════════════════════════════ -->
+<section class="slide" id="s2">
+  <div class="label blue rv">Part 01 — The Problem</div>
+  <h2 class="rv">No quick way to <span class="grad">check all locations</span></h2>
+
+  <div style="display:flex;flex-direction:column;gap:var(--gap);">
+    <div class="card rv">
+      <p>Users with multiple saved locations <strong>open each one individually.</strong>
+         There is no quick way to see which location needs attention today.</p>
+    </div>
+    <div class="card rv" style="border-color:rgba(255,112,92,0.3);background:rgba(255,112,92,0.04);">
+      <p><strong style="color:var(--s2)">Alerts only appear for emergencies.</strong> The common case is missed:
+         nothing is critical, but is anything <em>worth checking?</em></p>
+    </div>
+    <div class="card rv" style="border-color:rgba(255,84,73,0.3);background:rgba(255,84,73,0.04);">
+      <p><strong style="color:var(--s3)">Send too many alerts — and users ignore all of them.</strong> More notifications does not mean more awareness. Users stop paying attention, and the product loses value.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 3 — FEATURES ═════════════════════════════ -->
+<section class="slide" id="s3">
+  <div class="label blue rv">Part 01 — What We're Building</div>
+  <h2 class="rv">Four <span class="grad">core behaviors</span></h2>
+
+  <div class="feat-grid rv">
+    <div class="feat-item">
+      <div class="feat-icon bl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l4-4 4 4M12 2v13"/><path d="M20 16.7A5 5 0 0 1 7.3 20"/></svg>
+      </div>
+      <div>
+        <h3>Automatic Summary</h3>
+        <p>Shows a 7-day outlook across <strong>all saved locations</strong>. No questions needed.</p>
+      </div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon am">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--s1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+      </div>
+      <div>
+        <h3>Impact Ranking</h3>
+        <p>Shows the <strong>top 2–3 locations</strong> with the highest risk. Users can ask for more.</p>
+      </div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon pu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--hi)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <h3>Follow-up Q&amp;A</h3>
+        <p>Ask follow-up questions about a specific <strong>location, day, or condition</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4 — CHAT ══════════════════════════════════ -->
+<section class="slide" id="s4">
+  <div class="label blue rv">Part 01 — Example Interaction</div>
+  <h2 class="rv">What it feels like to <span class="grad">use it</span></h2>
+
+  <div class="chat-wrap rv">
+    <div class="chat-box">
+      <div class="chat-hdr">
+        <div class="chat-hdr-av">G</div>
+        <div>
+          <div class="chat-hdr-name">Gale</div>
+          <div class="chat-hdr-sub">AI weather advisor · 6 locations active</div>
+        </div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-av ai">G</div>
+        <div class="bubble">
+          Two of your six locations are notable this week.
+          <span class="ltag denver">Denver</span> has a <strong style="color:var(--s1)">flood risk Tuesday</strong> — 60 mm of rain expected.
+          <span class="ltag telaviv">Tel Aviv</span> has <strong style="color:var(--s0)">very high pollen</strong> through Wednesday.
+          The other four look quiet.
+        </div>
+      </div>
+      <div class="chat-msg" style="justify-content:flex-end;">
+        <div class="bubble me">What about wind in Denver?</div>
+        <div class="chat-av user">Y</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-av ai">G</div>
+        <div class="bubble">
+          Wind is mild — under <strong>20 km/h</strong> all week. The concern is the <strong style="color:var(--s1)">rain</strong>, not the wind.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 5 — IMPACT SCORE ══════════════════════════ -->
+<section class="slide" id="s5">
+  <div class="label blue rv">Part 01 — Impact Score</div>
+  <h2 class="rv">How we <span class="grad">rank</span> locations</h2>
+
+  <div style="display:flex;flex-direction:column;gap:var(--gap);">
+    <div class="signal hi rv">
+      <div class="sig-num hi">①</div>
+      <div class="sig-body">
+        <h3>Active severe-weather alerts <span style="font-size:var(--fs-label);font-family:'Roboto Mono',monospace;color:var(--c3);font-weight:400;letter-spacing:0.5px;">Events API</span></h3>
+      </div>
+      <div class="chip red">Highest weight</div>
+    </div>
+    <div class="signal md rv">
+      <div class="sig-num md">②</div>
+      <div class="sig-body">
+        <h3>Weather values that pass a dangerous threshold</h3>
+        <div class="tags" style="margin-top:clamp(10px,1.2vh,16px);">
+          <span class="tag">Temp extremes · heat stress index</span>
+          <span class="tag">Heavy precip · snow · freezing rain · hail</span>
+          <span class="tag">Flood index · fire index · lightning</span>
+          <span class="tag">Wind — sustained + gusts</span>
+          <span class="tag">Air quality · pollen</span>
+          <span class="tag">Low visibility (fog) · extreme UV</span>
+        </div>
+      </div>
+      <div class="chip amber">Mid weight</div>
+    </div>
+    <div class="signal lo rv">
+      <div class="sig-num lo">③</div>
+      <div class="sig-body">
+        <h3>Unusual weather vs. normal patterns</h3>
+        <p>Unusually cold weather <strong>after a warm week</strong> ranks higher than a regular cold period.</p>
+      </div>
+      <div class="chip blue">Lower weight</div>
+    </div>
+    <div class="callout rv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>All thresholds are <strong style="color:var(--ok)">adjustable after launch — no new release needed.</strong> We tune them based on how real users respond.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6 — DISCOVERY ═════════════════════════════ -->
+<section class="slide" id="s6">
+  <div class="label blue rv">Part 01 — Discovery</div>
+  <h2 class="rv">A badge that <span class="grad">only shows when it matters</span></h2>
+
+  <div class="badge-row rv">
+    <div class="badge-state">
+      <div class="badge-wrap">
+        <div class="badge-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span class="bdot none"></span>
+      </div>
+      <div class="blabel none">Quiet — no badge</div>
+    </div>
+    <div class="badge-state">
+      <div class="badge-wrap">
+        <div class="badge-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span class="bdot medium"></span>
+      </div>
+      <div class="blabel medium">Medium — amber</div>
+    </div>
+    <div class="badge-state">
+      <div class="badge-wrap">
+        <div class="badge-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span class="bdot high"></span>
+      </div>
+      <div class="blabel high">High — red pulse</div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:var(--gap);" class="rv">
+    <div class="rule">
+      <div class="rnum">1</div>
+      <p><strong>No badge when everything is calm.</strong> Only shows when there is something worth opening.</p>
+    </div>
+    <div class="rule">
+      <div class="rnum">2</div>
+      <p><strong>Goes away once opened.</strong> Comes back only if the weather gets <em>worse</em> — not just stays the same.</p>
+    </div>
+    <div class="rule">
+      <div class="rnum">3</div>
+      <p><strong>Badge rules planned as a separate task</strong> — so they do not delay shipping the main feature.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 7 — METRICS ══════════════════════════════ -->
+<section class="slide" id="s7">
+  <div class="label blue rv">Part 01 — Success</div>
+  <h2 class="rv">How we'll know <span class="grad">it worked</span></h2>
+
+  <div class="metrics rv">
+    <div class="mcard hi">
+      <div style="font-size:clamp(9px,0.8vw,11px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--c3);font-family:'Roboto Mono',monospace;margin-bottom:clamp(6px,0.8vh,10px);">2+ saved locations</div>
+      <div class="mlabel" style="margin-bottom:clamp(10px,1.2vh,16px);">% of eligible users using chat</div>
+      <div style="display:flex;gap:clamp(16px,1.8vw,28px);align-items:flex-end;">
+        <div>
+          <div class="mnum g">30%</div>
+          <div class="mqual">week 1</div>
+        </div>
+        <div>
+          <div class="mnum g">50%</div>
+          <div class="mqual">month 1</div>
+        </div>
+      </div>
+    </div>
+    <div class="mcard">
+      <div class="mnum">40%</div>
+      <div class="mlabel">Weekly return rate among adopters</div>
+      <div class="mqual">retention</div>
+    </div>
+    <div class="mcard">
+      <div class="mnum">≥1</div>
+      <div class="mlabel">Avg. follow-up questions per session</div>
+      <div class="mqual">signal users go deeper</div>
+    </div>
+    <div class="mcard">
+      <div class="mnum">70%</div>
+      <div class="mlabel">Summary thumbs-up rate</div>
+      <div class="mqual">from users who rated it</div>
+    </div>
+  </div>
+
+  <div class="mnote rv">
+    <strong>Eligible users = those with 2 or more saved locations.</strong> Comparing week 1 to month 1 tells us if users keep coming back — or just tried it once. At least <strong>1 follow-up question per session</strong> signals real engagement, not just a glance.
+  </div>
+</section>
+
+<!-- ═══ 8 — PART 02 DIVIDER ══════════════════════ -->
+<section class="slide" id="s8">
+  <div class="eyebrow rv">Part 02</div>
+  <h1 class="rv">The <span class="grad">Prototype</span></h1>
+  <p class="part-desc rv">A working dashboard built in a single afternoon — using Claude to extract Tomorrow.io's design language and generate a native-looking mock.</p>
+  <div class="cover-parts rv">
+    <div class="cpart">
+      <div class="cpart-num">First</div>
+      <div class="cpart-name">How it was built</div>
+    </div>
+    <div class="cpart">
+      <div class="cpart-num">Then</div>
+      <div class="cpart-name">The prototype</div>
+    </div>
+    <div class="cpart">
+      <div class="cpart-num">Then</div>
+      <div class="cpart-name">Design rationale</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 9 — HOW WE BUILT IT ══════════════════════ -->
+<section class="slide" id="s9">
+  <div class="label purple rv">Part 02 — Prototype</div>
+  <h2 class="rv">From design scan to <span class="grad">working mock</span></h2>
+
+  <div class="build-flow rv">
+    <div class="build-step">
+      <div class="bstep-hdr">
+        <div class="bstep-num">Step 1</div>
+        <h3>Capture Tomorrow.io's design language</h3>
+      </div>
+      <p>Used the <strong>Claude browser extension</strong> to scan the live Tomorrow.io web app — extracting its layout, color palette, typography, spacing, and component styles directly from the page. No design system doc needed.</p>
+      <div class="tags" style="margin-top:clamp(10px,1.2vh,16px);">
+        <span class="tag">Dark navy bg</span>
+        <span class="tag">Muli + Roboto Mono</span>
+        <span class="tag">Brand gradient</span>
+        <span class="tag">Card &amp; chip patterns</span>
+        <span class="tag">Spacing tokens</span>
+      </div>
+    </div>
+
+    <div class="bstep-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+    </div>
+
+    <div class="build-step hi">
+      <div class="bstep-hdr">
+        <div class="bstep-num hi">Step 2</div>
+        <h3>Build the mock with Claude Code</h3>
+      </div>
+      <p>Fed the style guide into <strong>Claude Code</strong> using the <em>frontend-design</em> skill — which generates production-grade UI that matches the exact look and feel of the existing product.</p>
+      <div class="tags" style="margin-top:clamp(10px,1.2vh,16px);">
+        <span class="tag">100% static · no backend</span>
+        <span class="tag">HTML / CSS / JS</span>
+        <span class="tag">Deployed to Vercel</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout rv">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    <span>The result looks and feels native to Tomorrow.io — users recognise the product immediately. The whole prototype was built in a single afternoon.</span>
+  </div>
+</section>
+
+<!-- ═══ 10 — PROTOTYPE ═══════════════════════════ -->
+<section class="slide" id="s10">
+  <div class="label purple rv">Part 02 — Prototype</div>
+  <h2 class="rv">Weather Risk <span class="grad">Dashboard</span></h2>
+
+  <div class="zones rv">
+    <div class="zone">
+      <div class="znum z1">1</div>
+      <h3>Risk Map</h3>
+      <p>Click any city to see its <strong>risk data</strong> in the sidebar.</p>
+    </div>
+    <div class="zone">
+      <div class="znum z2">2</div>
+      <h3>Location Sidebar</h3>
+      <p>Risk score, staff impact, and Gale AI entry point — ask Gale to get <strong>dollar exposure estimates</strong>.</p>
+    </div>
+    <div class="zone">
+      <div class="znum z3">3</div>
+      <h3>Gale AI Summary</h3>
+      <p>One-tap summary of <strong>what the weather means for the business</strong> — risk context, dollar impact on request, and a clear recommended action.</p>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:clamp(8px,0.8vw,12px);margin-top:var(--gap);" class="rv">
+    <div class="chip plain">Claude Code + Gemini</div>
+    <div class="chip plain">Leaflet.js maps</div>
+    <div class="chip plain">Fully static · no backend</div>
+  </div>
+</section>
+
+<!-- ═══ 11 — CHOICES ════════════════════════════ -->
+<section class="slide" id="s11">
+  <div class="label purple rv">Part 02 — Design Rationale</div>
+  <h2 class="rv">Every path ends in <span class="grad">action</span></h2>
+
+  <div class="flow rv">
+    <div class="fnode">
+      <div class="fnode-icon">📍</div>
+      <div class="fnode-label">Location</div>
+      <div class="fnode-sub">Map pin</div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fnode">
+      <div class="fnode-icon">⚡</div>
+      <div class="fnode-label">Risk Score</div>
+      <div class="fnode-sub">Ranked</div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fnode hi">
+      <div class="fnode-icon">💰</div>
+      <div class="fnode-label">Business Impact</div>
+      <div class="fnode-sub">ranked</div>
+    </div>
+    <div class="farrow">→</div>
+    <div class="fnode hi">
+      <div class="fnode-icon">✦</div>
+      <div class="fnode-label">Gale AI</div>
+      <div class="fnode-sub">Recommended action</div>
+    </div>
+  </div>
+
+  <div class="cg rv">
+    <div class="ci">
+      <h3>Built for decisions, not data display</h3>
+      <p>Risk scores are ranked by severity. Ask Gale to get <strong>dollar impact and staff estimates</strong>. Every screen ends with a recommendation, not raw numbers.</p>
+    </div>
+    <div class="ci">
+      <h3>Gale talks business, not weather</h3>
+      <p>"Reschedule Tuesday's outdoor crew" — not "60 mm of rain." <strong>Ready-made prompts</strong> make it easy to start.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 12 — SUMMARY ══════════════════════════════ -->
+<section class="slide" id="s12">
+  <div class="label muted rv">The Thread</div>
+  <h2 class="rv">Both parts share <span class="grad">one idea</span></h2>
+
+  <div class="sumgrid rv">
+    <div class="sumcard c1">
+      <div class="sumcard-icon">🔀</div>
+      <h3>Rank, don't list</h3>
+      <p>Show users <strong>what matters most</strong>, not everything. Both the chat and the dashboard start with the highest-risk item first.</p>
+    </div>
+    <div class="sumcard c2">
+      <div class="sumcard-icon">🧠</div>
+      <h3>Interpret, don't deliver</h3>
+      <p>Tomorrow.io's advantage is <strong>turning data into clear insight</strong>. Both features make that advantage stronger.</p>
+    </div>
+    <div class="sumcard c3">
+      <div class="sumcard-icon">⚡</div>
+      <h3>Recommend, don't observe</h3>
+      <p>Operations managers need to know <strong>what to do next</strong>. Every screen ends with a clear, concrete action.</p>
+    </div>
+  </div>
+
+  <div class="plink rv">
+    <div>
+      <div style="font-size:var(--fs-label);color:var(--c3);font-family:'Roboto Mono',monospace;margin-bottom:6px;letter-spacing:1.5px;">LIVE PROTOTYPE</div>
+      <div class="purl">tomorrowio-weather-risk-dashboard.vercel.app</div>
+    </div>
+    <a href="https://tomorrowio-weather-risk-dashboard.vercel.app" target="_blank" class="btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Open Prototype
+    </a>
+  </div>
+
+  <div class="tagline rv">
+    Weather intelligence is only valuable<br>
+    <span class="grad">when it drives decisions.</span>
+  </div>
+
+  <div class="byline rv">
+    <div class="byline-ln"></div>
+    <span>Yam Cohen · Tomorrow.io PM Assignment · 2026</span>
+    <div class="byline-ln"></div>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<button class="nav-arrow prev" id="prev-btn" aria-label="Previous" style="display:none"></button>
+<button class="nav-arrow next" id="next-btn" aria-label="Next" style="display:none"></button>
+
+<div class="nav-hint">
+  <kbd>←</kbd> <span>prev</span>
+  <span style="width:14px;display:inline-block"></span>
+  <span>next</span> <kbd>→</kbd>
+</div>
+<div class="slide-counter" id="counter">1 / 12</div>
+<div class="progress-bar" id="pbar" style="width:8.33%"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total  = slides.length;
+  let cur = 0, busy = false;
+
+  const counter = document.getElementById('counter');
+  const pbar    = document.getElementById('pbar');
+  const prev    = document.getElementById('prev-btn');
+  const next    = document.getElementById('next-btn');
+
+  function go(idx){
+    if(busy || idx===cur || idx<0 || idx>=total) return;
+    busy = true;
+    const fwd = idx > cur;
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add(fwd ? 'exit-l' : 'exit-r');
+    const to = slides[idx];
+    to.style.transform = fwd ? 'translateX(48px)' : 'translateX(-48px)';
+    to.style.opacity   = '0';
+    to.offsetHeight;
+    to.style.transform = '';
+    to.style.opacity   = '';
+    to.classList.add('active');
+    cur = idx;
+    sync();
+    setTimeout(()=>{ slides.forEach(s=>s.classList.remove('exit-l','exit-r')); busy=false; }, 380);
+  }
+
+  function sync(){
+    counter.textContent = `${cur+1} / ${total}`;
+    pbar.style.width    = `${((cur+1)/total)*100}%`;
+    prev.style.opacity  = cur===0       ? '0.3' : '1';
+    next.style.opacity  = cur===total-1 ? '0.3' : '1';
+  }
+
+  prev.addEventListener('click', e=>{ e.stopPropagation(); go(cur-1); });
+  next.addEventListener('click', e=>{ e.stopPropagation(); go(cur+1); });
+
+  document.addEventListener('keydown', e=>{
+    if(['ArrowRight','ArrowDown',' '].includes(e.key)){ e.preventDefault(); go(cur+1); }
+    if(['ArrowLeft','ArrowUp'].includes(e.key))       { e.preventDefault(); go(cur-1); }
+  });
+
+  document.getElementById('deck').addEventListener('click', e=>{
+    if(e.target.closest('a,button')) return;
+    go(cur+1);
+  });
+
+  let tx=0;
+  document.addEventListener('touchstart', e=>{ tx=e.touches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',   e=>{
+    const dx = tx - e.changedTouches[0].clientX;
+    if(Math.abs(dx)>40) go(dx>0 ? cur+1 : cur-1);
+  });
+
+  sync();
+})();
+</script>
+</body>
+</html>

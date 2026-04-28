@@ -3,7 +3,8 @@
     "allow": [
       "Bash(start *)",
       "Bash(gh repo *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "WebFetch(domain:docs.tomorrow.io)"
     ]
   }
 }
